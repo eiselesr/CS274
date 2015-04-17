@@ -1,25 +1,85 @@
+turtles-own [energy]
 to setup 
   clear-all
-  create-turtles 100 [ setxy random-xcor random-ycor]
+  setup-patches
+  setup-turtles  
   reset-ticks
 end
 
+to setup-patches
+  ask patches [set pcolor green]
+end
+
+to setup-turtles
+  ;;create-turtles 100 [ setxy random-xcor random-ycor]
+  create-turtles number [ setxy random-xcor random-ycor]
+  ;;ask turtles [ setxy random-xcor random-ycor]
+  ask turtles[pen-down]
+end
+
 to go
+  if ticks >= 500 [ stop ]
   move-turtles
+  eat-grass
+  reproduce
+  check-death
+  regrow-grass
   tick
 end
 
 to move-turtles
-  ask turtles[
+  ask turtles
+  [
     right random 360
     forward 1
+    ;;forward .1
+    set energy energy - 1
+  ]
+end
+
+to eat-grass
+  ask turtles
+  [
+    if pcolor = green
+    [
+      set pcolor black 
+      set energy (energy + energy-from-grass)
+    ]
+    ifelse show-energy?
+    [set label energy];;true condition
+    [set label ""];;false condition
+  ]
+end
+
+to reproduce
+  ask turtles
+  [
+    if energy > 50
+    [
+      set energy (energy - birth-energy)
+      hatch 1 [set energy birth-energy]
+    ]
+  ]
+end
+
+to check-death 
+  ask turtles
+  [
+    if energy <= 0 [die]
+  ]
+end
+
+to regrow-grass
+  ask patches 
+  [
+    if random 100 < grass-regrowth-% [set pcolor green]
   ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-210
+503
 10
-649
+942
 470
 16
 16
@@ -44,10 +104,10 @@ ticks
 30.0
 
 BUTTON
-46
-40
-110
-74
+5
+10
+69
+44
 NIL
 setup
 NIL
@@ -61,10 +121,10 @@ NIL
 1
 
 BUTTON
-46
-74
-110
-108
+5
+44
+69
+78
 NIL
 go
 T
@@ -76,6 +136,118 @@ NIL
 NIL
 NIL
 0
+
+MONITOR
+112
+195
+195
+240
+NIL
+count turtles
+17
+1
+11
+
+MONITOR
+18
+196
+111
+241
+green patches
+count patches with [pcolor = green]
+17
+1
+11
+
+SWITCH
+368
+16
+502
+49
+show-energy?
+show-energy?
+0
+1
+-1000
+
+PLOT
+14
+242
+497
+518
+Totals
+time
+totals
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"turtles" 1.0 0 -16777216 true "" "plot count turtles"
+"grass" 1.0 0 -10899396 true "" "plot count patches with [pcolor = green]"
+
+SLIDER
+330
+50
+502
+83
+number
+number
+0
+1000
+89
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+329
+84
+501
+117
+energy-from-grass
+energy-from-grass
+0
+20
+4
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+329
+116
+501
+149
+birth-energy
+birth-energy
+0
+100
+25
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+329
+149
+501
+182
+grass-regrowth-%
+grass-regrowth-%
+0
+100
+1
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?

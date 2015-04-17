@@ -1,6 +1,6 @@
 extensions [array]
 breed [students student]
-students-own [energy lambda mem-array];;max energy ; energy rate of decay while reading
+students-own [energy memory];; lambda mem-array];;max energy ; energy rate of decay while reading
 breed [professors professor]
 
 to setup
@@ -12,8 +12,9 @@ end
 to setup-students
   create-students 1
   ask students [ set energy 50 + random 50]
-  ask students [ set lambda .01]
-  ask students [ set mem-array array:from-list n-values 16 [0]]
+  ask students [set memory 0]
+  ;;ask students [ set lambda .01]
+  ;;ask students [ set mem-array array:from-list n-values 16 [0]]
 end
 
 to go
@@ -28,15 +29,15 @@ to choose-activity
     [read]
     [rest]
     
-    ifelse show-energy?
-      [set label energy]
-      [set label ""]
+    ifelse show-memory?
+    [set label energy]
+    [set label ""]
   ]
 end
 
 to read
-   ;; set energy energy - 1
-  set energy energy * exp(- lambda * ticks) + 1
+    set energy energy - 1
+  ;;set energy energy * exp(- lambda * ticks) + 1
 end
 
 to rest
@@ -104,22 +105,11 @@ NIL
 NIL
 0
 
-SWITCH
-21
-211
-163
-244
-show-energy?
-show-energy?
-0
-1
--1000
-
 PLOT
-18
-258
-264
-461
+19
+341
+265
+544
 Energy
 time
 energy
@@ -132,6 +122,17 @@ false
 "" ""
 PENS
 "energy" 1.0 0 -16777216 true "" "plot [energy] of turtle 0"
+
+SWITCH
+32
+211
+171
+244
+show-memory?
+show-memory?
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -349,6 +350,31 @@ Polygon -7500403 true true 105 90 120 195 90 285 105 300 135 300 150 225 165 300
 Rectangle -7500403 true true 127 79 172 94
 Polygon -7500403 true true 195 90 240 150 225 180 165 105
 Polygon -7500403 true true 105 90 60 150 75 180 135 105
+
+person student
+false
+0
+Polygon -13791810 true false 135 90 150 105 135 165 150 180 165 165 150 105 165 90
+Polygon -7500403 true true 195 90 240 195 210 210 165 105
+Circle -7500403 true true 110 5 80
+Rectangle -7500403 true true 127 79 172 94
+Polygon -7500403 true true 105 90 120 195 90 285 105 300 135 300 150 225 165 300 195 300 210 285 180 195 195 90
+Polygon -1 true false 100 210 130 225 145 165 85 135 63 189
+Polygon -13791810 true false 90 210 120 225 135 165 67 130 53 189
+Polygon -1 true false 120 224 131 225 124 210
+Line -16777216 false 139 168 126 225
+Line -16777216 false 140 167 76 136
+Polygon -7500403 true true 105 90 60 195 90 210 135 105
+
+person-read
+false
+0
+Circle -7500403 true true 110 5 80
+Polygon -7500403 true true 105 90 120 195 90 285 105 300 135 300 150 225 165 300 195 300 210 285 180 195 195 90
+Rectangle -7500403 true true 127 79 172 94
+Polygon -2674135 true false 75 135 90 150 135 165 135 150 105 135 120 105 105 90
+Polygon -2674135 true false 225 135 210 150 165 165 165 150 195 135 180 105 195 90
+Polygon -13345367 true false 129 130 130 184 153 192 171 186 172 130 156 139 130 131
 
 plant
 false
