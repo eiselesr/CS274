@@ -1,6 +1,6 @@
 extensions [array]
 breed [students student]
-students-own [energy memory];; lambda mem-array];;max energy ; energy rate of decay while reading
+students-own [energy memory state question level];; lambda mem-array];;max energy ; energy rate of decay while reading
 breed [professors professor]
 
 to setup
@@ -10,9 +10,10 @@ to setup
 end
 
 to setup-students
-  create-students 1
+  create-students 2
   ask students [ set energy 50 + random 50]
   ask students [set memory 0]
+  ask students [set state "read"]
   ;;ask students [ set lambda .01]
   ;;ask students [ set mem-array array:from-list n-values 16 [0]]
 end
@@ -23,32 +24,62 @@ to go
 end
 
 to choose-activity
-  ask turtles
+  foreach sort turtles
   [
-    ifelse energy > 0
-    [read]
-    [rest]
-    
-    ifelse show-memory?
-    [set label energy]
-    [set label ""]
-  ]
+    ask ?
+    [
+      set level floor (memory / 10)
+      ;;-------REST-------------
+      if state = "rest"
+      [
+        ifelse energy < 100
+        [rest]
+        [set state "read"]
+      ]
+      ;;-------READ-------------
+      if state = "read"
+      [
+        ifelse energy > 0 
+        [read]
+        [set state "rest"]
+      ]
+      ;;-------STUCK------------
+      if state = "stuck"
+      [
+        ;;Go find someone to ask
+      ]
+      ;;-----------------------
+    ]
+   ]
 end
 
+
+;; 5% chance to not understand something, then 16% chance for it to be 2 levels higher than student.
 to read
+  let stuck random 100
+  if stuck >= 95
+  [                                               ;; Most of the time the student doesn't get stuck
+    set question ceiling(random-normal (level) 2) ;; assume level is 3.=>84% of values will be less than 5. Ceil to have integer, but capture >5
+    if question > level + 2 ;;=> Example Continued: If the question level is 5 or higher then the student is stuck.
+    [ set state "stuck"]
+   ]
+  
+  
     set energy energy - 1
+    set memory memory + 1
   ;;set energy energy * exp(- lambda * ticks) + 1
 end
 
 to rest
   set energy energy + 5
 end
+
 @#$#@#$#@
 GRAPHICS-WINDOW
-373
-8
-812
-468
+625
+16
+1064
+476
 16
 16
 13.0
@@ -72,10 +103,10 @@ ticks
 30.0
 
 BUTTON
-37
-54
-101
-88
+19
+10
+83
+44
 NIL
 setup
 NIL
@@ -89,10 +120,10 @@ NIL
 1
 
 BUTTON
-65
-113
-129
+83
+10
 147
+44
 NIL
 go
 T
@@ -106,10 +137,10 @@ NIL
 0
 
 PLOT
-19
-341
-265
-544
+9
+54
+592
+569
 Energy
 time
 energy
@@ -121,13 +152,14 @@ true
 false
 "" ""
 PENS
-"energy" 1.0 0 -16777216 true "" "plot [energy] of turtle 0"
+"energy0" 1.0 0 -16777216 true "" "plot [energy] of turtle 0"
+"energy1" 1.0 0 -987046 true "" "plot [energy] of turtle 1"
 
 SWITCH
-32
-211
-171
-244
+147
+10
+286
+43
 show-memory?
 show-memory?
 1
