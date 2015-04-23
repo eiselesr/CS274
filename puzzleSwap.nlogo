@@ -1,79 +1,169 @@
 extensions [array]
 breed [students student]
-students-own [energy memory state question level];; lambda mem-array];;max energy ; energy rate of decay while reading
+students-own[
+  energy 
+  memory 
+  state 
+  question 
+  level 
+  attempts 
+  help 
+  steps 
+  nearest-neighbor 
+  sociability
+  sociability-max
+  partner
+  ];; lambda mem-array];;max energy ; energy rate of decay while reading
 breed [professors professor]
 
 to setup
   clear-all
-  setup-students  
+  stop-inspecting-dead-agents
+  setup-students 
+  setup-professor 
   reset-ticks
 end
 
 to setup-students
-  create-students 2
-  ask students [ set energy 50 + random 50]
-  ask students [set memory 0]
-  ask students [set state "read"]
+  set-default-shape students "person-read"
+  create-students 3
+  [
+    setxy random-xcor random-ycor
+    set energy 50 + random 50
+    set memory 0
+    ;;set state "read"
+    set state "socialize"
+    set attempts 0
+    set help 2
+    set partner nobody
+    set sociability-max random 100
+    set sociability random sociability-max
+  ]
+  ask students [inspect self] ;;inspect student # for all students
   ;;ask students [ set lambda .01]
   ;;ask students [ set mem-array array:from-list n-values 16 [0]]
 end
 
+to setup-professor
+  set-default-shape professors "person graduate"
+  create-professors 1
+end
+
 to go
-  choose-activity
+  do-activity
   tick
 end
 
 to choose-activity
-  foreach sort turtles
+  set level floor (memory / 10)
+  
+  ifelse (energy <= 0) [set state "rest"]
+  [ifelse (attempts > 4) [set state "seek"]
+  [ifelse (question > 0) and (energy < 50) [set state "rest"]
+  [ifelse (question > 0) [set state "stuck"]
+  [set state "read";; default case
+  ]]]]
+ 
+end
+
+to do-activity
+  foreach sort students
   [
     ask ?
     [
-      set level floor (memory / 10)
       ;;-------REST-------------
-      if state = "rest"
-      [
-        ifelse energy < 100
-        [rest]
-        [set state "read"]
-      ]
+      if (state = "rest") [rest]
       ;;-------READ-------------
-      if state = "read"
-      [
-        ifelse energy > 0 
-        [read]
-        [set state "rest"]
-      ]
+      if (state = "read") [read]
       ;;-------STUCK------------
-      if state = "stuck"
-      [
-        ;;Go find someone to ask
-      ]
-      ;;-----------------------
+      if (state = "stuck") [try]
+      ;;-------SEEK-------------
+      if (state = "seek") [seek]
+      ;;-------MEET-------------
+      if (state = "meet") [meet]
+      ;;-------AWAY-------------
+      if (state = "away") [away]
+      ;;-------SOCIAL-----------
+      if (state = "socialize") [socialize]
+      ;;-------CHAT-------------
+      if (state = "chat") [chat]
+      
     ]
-   ]
+  ]
+  
 end
 
 
 ;; 5% chance to not understand something, then 16% chance for it to be 2 levels higher than student.
 to read
   let stuck random 100
-  if stuck >= 95
-  [                                               ;; Most of the time the student doesn't get stuck
-    set question ceiling(random-normal (level) 2) ;; assume level is 3.=>84% of values will be less than 5. Ceil to have integer, but capture >5
-    if question > level + 2 ;;=> Example Continued: If the question level is 5 or higher then the student is stuck.
-    [ set state "stuck"]
-   ]
-  
-  
+  if stuck >= 95  ;; The student comes across something they don't "get" 
+  [                                                 
+    set question ceiling(random-normal (level) ZPD) ;; Set question difficulty level. Assume level is 3 and ZPD is 2. Then 84% of values are <5
+  ]  
     set energy energy - 1
     set memory memory + 1
+    choose-activity 
   ;;set energy energy * exp(- lambda * ticks) + 1
 end
 
-to rest
+to rest 
   set energy energy + 5
+  if energy >= 100 ;; If we're going to rest, we're going to do it 100%!
+  [choose-activity]
 end
 
+to try
+  set attempts attempts + 1
+  ifelse (random-normal level ZPD) > question ;; Can the student figure it out on their own? ;; Maybe multiply attempt value by energy %
+  [ set question 0 set attempts 0];; regain some energy when stuccessful? 
+  [ set energy energy - nrgCost]
+  
+  choose-activity
+end
+
+to seek
+  face one-of professors
+  forward 1
+  if (distance one-of professors) <= 2
+  [
+    set state "meet";
+    ]
+end
+
+to meet
+  if (random-normal level ZPD) + help > question
+  [set question 0 set attempts 0 set state "away" set steps (random 10) + 5 set heading random 360]
+  ;;[set energy energy - ceiling(nrgCost / 2)] ;; Should the student lose energy while talking with the teacher?
+end
+
+to away
+  if steps > 0
+  [
+    forward 1
+    set steps steps - 1
+  ]
+  if steps = 0
+  [choose-activity]  
+end
+
+to socialize
+  if partner = nobody
+  [
+    set nearest-neighbor min-one-of (other students with [state = "socialize" or state = "stuck" or state = "read"])[distance myself];; Find the closest student of the students with state
+    set partner nearest-neighbor
+    ask nearest-neighbor [set partner myself]    
+  ] 
+  ifelse (distance partner > 2)
+  [face partner forward 1]
+  [set state "chat"]
+end
+
+to chat
+  ;;refresh memory. Probably need to add new max-known variable or somthing
+  ;;check to see who has higher knowledge - assign giver and receiver. 
+  ;; Probably compare levels... 
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 625
@@ -162,9 +252,56 @@ SWITCH
 43
 show-memory?
 show-memory?
-1
+0
 1
 -1000
+
+SLIDER
+149
+614
+321
+647
+ZPD
+ZPD
+0
+5
+2
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+397
+602
+569
+635
+nrgCost
+nrgCost
+0
+10
+10
+1
+1
+NIL
+HORIZONTAL
+
+BUTTON
+288
+10
+363
+43
+go once
+go
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -382,6 +519,24 @@ Polygon -7500403 true true 105 90 120 195 90 285 105 300 135 300 150 225 165 300
 Rectangle -7500403 true true 127 79 172 94
 Polygon -7500403 true true 195 90 240 150 225 180 165 105
 Polygon -7500403 true true 105 90 60 150 75 180 135 105
+
+person graduate
+false
+0
+Circle -16777216 false false 39 183 20
+Polygon -1 true false 50 203 85 213 118 227 119 207 89 204 52 185
+Circle -7500403 true true 110 5 80
+Rectangle -7500403 true true 127 79 172 94
+Polygon -8630108 true false 90 19 150 37 210 19 195 4 105 4
+Polygon -8630108 true false 120 90 105 90 60 195 90 210 120 165 90 285 105 300 195 300 210 285 180 165 210 210 240 195 195 90
+Polygon -1184463 true false 135 90 120 90 150 135 180 90 165 90 150 105
+Line -2674135 false 195 90 150 135
+Line -2674135 false 105 90 150 135
+Polygon -1 true false 135 90 150 105 165 90
+Circle -1 true false 104 205 20
+Circle -1 true false 41 184 20
+Circle -16777216 false false 106 206 18
+Line -2674135 false 208 22 208 57
 
 person student
 false
