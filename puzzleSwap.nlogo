@@ -1,44 +1,90 @@
 extensions [array]
 breed [students student]
-students-own[
-  energy 
-  memory 
-  state 
-  question 
-  level 
-  attempts 
-  help 
-  steps 
-  nearest-neighbor 
-  sociability
-  sociability-max
+students-own[  
+  ;;--SOCIAL energy factors--
+  socialStamina
+  socialNrg
+  socialDrain
+  socialRecover
+  socialTime ;; expected time to spend socializing
+  socialDev
+  ;;--MENTAL energy factors--
+  mentalStamina
+  mentalNrg
+  mentalDrain
+  mentalRecover
+  mentalTime ;; expected time to spend reading
+  mentalDev
+  ;;--Learning factors--
+  ;;ZPD slider value
+  chanceOfLearning
+  chanceOfQuestion
+  knowledge
+  question
+  level
+  bestLevel
+  collabX
+  questionX
+  ;;--Preferences--
+  restPref
+  consultPref
+  collabPref
+  readPref
+  ;;--Other--
   partner
-  ];; lambda mem-array];;max energy ; energy rate of decay while reading
+  state
+  options
+  time
+  ]
 breed [professors professor]
 
 to setup
   clear-all
   stop-inspecting-dead-agents
-  setup-students 
   setup-professor 
+  setup-students   
   reset-ticks
 end
 
 to setup-students
   set-default-shape students "person-read"
-  create-students 3
+  create-students 2
   [
-    setxy random-xcor random-ycor
-    set energy 50 + random 50
-    set memory 0
-    ;;set state "read"
-    set state "socialize"
-    set attempts 0
-    set help 2
+    setxy random-xcor random-ycor;; Distribute students in world
+    
+    set socialStamina 100 ;;social energy maximum
+    set socialNrg socialStamina ;; current social energy
+    set socialDrain ceiling (10 * (random-beta 10)) ;; when socializing, rate at which energy is lost
+    set socialRecover 5;; Same for all students
+    set socialTime 15
+    set socialDev 5
+    
+    set mentalStamina 100 ;;mental energy maximum
+    set mentalNrg socialStamina ;; current mental energy
+    set mentalDrain ceiling (10 * (random-beta 10)) ;; when studying, rate at which energy is lost
+    set mentalRecover 5;; Same for all students
+    set mentalTime 15;
+    set mentalDev 5
+    
+    set chanceOfLearning random-float 1 ;; uniform distribution between 0 and 1
+    set chanceOfQuestion random-float 1 ;;
+    set knowledge 0 ;;
+    set question 0 ;; No question to start simulation
+    set level 0 ;; level = knowledge/10
+    set bestLevel 0 ;; bestLevel = highest level reached
+    set collabX 1.1 ;; Collaborating makes learning more effective
+    set questionX 1.2 ;; Studying with a question in mind makes learning more effective and draining
+    
+    set restPref (random 10) + 1 ;; 1-10
+    set consultPref (random 10) + 1
+    set collabPref (random 10) + 1
+    set readPref (random 10) + 1
+    
     set partner nobody
-    set sociability-max random 100
-    set sociability random sociability-max
+    set state "rest"    
+    set time 0
   ]
+  ask students [choose-activity]
   ask students [inspect self] ;;inspect student # for all students
   ;;ask students [ set lambda .01]
   ;;ask students [ set mem-array array:from-list n-values 16 [0]]
@@ -54,122 +100,170 @@ to go
   tick
 end
 
-to choose-activity
-  set level floor (memory / 10)
+to choose-activity  
+  set options []
+  let nearest-neighbor min-one-of (other students with [state = "read" or state = "rest"])[distance myself];; Find the closest student of the students with state
+  let a 0
+  let b 0
+  let c 0
+  ;;-------READ---------------------------
+  if(mentalNrg - mentalTime) > 0
+  [set options lput "read" options 
+   set a 1 ]
   
-  ifelse (energy <= 0) [set state "rest"]
-  [ifelse (attempts > 4) [set state "seek"]
-  [ifelse (question > 0) and (energy < 50) [set state "rest"]
-  [ifelse (question > 0) [set state "stuck"]
-  [set state "read";; default case
-  ]]]]
- 
+  ;;-------COLLABORATE--------------------
+  ifelse(nearest-neighbor = nobody)
+  [
+    if(socialNrg - socialTime) > 0
+    [set options lput "collaborate" options
+     set b 1]
+  ]
+  [    
+    if(socialNrg - (socialTime + distance nearest-neighbor)) > 0
+    [set options lput "collaborate" options
+     set b 1]
+  ]  
+  
+  ;;-------CONSULT----------------
+  if ((mentalNrg - distance one-of professors) > 0 and (question > 0)) ;; SHOULD WE CHECK MENTAL AND SOCIAL ENERGY?
+  [ set options lput "consult" options
+    set c 1]
+  
+  ;;-------REST-------------
+  set options lput "rest" options
+  
+  ;;-----------------------------
+  ;;         CHOOSE
+  ;;-----------------------------
+  let total (a * readPref) + (b * collabPref) + (c * consultPref) + restPref
+  let readLim  (a * readPref)
+  let collabLim (b * collabPref) + readLim
+  let consultLim (c * consultPref) + collabLim
+  
+  let choice (random total) + 1
+   ifelse(choice > 0           and (choice <= readLim))   [set state "read" set time ceiling(random-normal mentalTime mentalDev)  ]
+  [ifelse(choice > (readLim)   and (choice <= collabLim)) [set state "collaborate" set time ceiling(random-normal socialTime socialDev)  ]
+  [ifelse(choice > (collabLim) and (choice <= consultLim))[set state "consult"]
+  [set state "rest" ;; default case
+  ]]]  
+  
+;  set level floor (knowledge / 10)
 end
 
-to do-activity
+to do-activity  
   foreach sort students
   [
     ask ?
-    [
-      ;;-------REST-------------
-      if (state = "rest") [rest]
+    [      
       ;;-------READ-------------
       if (state = "read") [read]
-      ;;-------STUCK------------
-      if (state = "stuck") [try]
-      ;;-------SEEK-------------
-      if (state = "seek") [seek]
-      ;;-------MEET-------------
-      if (state = "meet") [meet]
-      ;;-------AWAY-------------
-      if (state = "away") [away]
-      ;;-------SOCIAL-----------
-      if (state = "socialize") [socialize]
-      ;;-------CHAT-------------
-      if (state = "chat") [chat]
-      
+      ;;-------COLLABORATE--------------------
+      ;;if (state = "collaborate") [collaborate]  
+      ;;-------CONSULT----------------
+      ;;if (state = "consult") [consult]
+      ;;-------REST-------------
+      ;;if (state = "rest") [rest]
+      ;;-------MOVE------------
+      ;;if (state = "move") [move]
     ]
   ]
   
 end
 
 
-;; 5% chance to not understand something, then 16% chance for it to be 2 levels higher than student.
-to read
-  let stuck random 100
-  if stuck >= 95  ;; The student comes across something they don't "get" 
-  [                                                 
-    set question ceiling(random-normal (level) ZPD) ;; Set question difficulty level. Assume level is 3 and ZPD is 2. Then 84% of values are <5
-  ]  
-    set energy energy - 1
-    set memory memory + 1
-    choose-activity 
-  ;;set energy energy * exp(- lambda * ticks) + 1
-end
-
-to rest 
-  set energy energy + 5
-  if energy >= 100 ;; If we're going to rest, we're going to do it 100%!
-  [choose-activity]
-end
-
-to try
-  set attempts attempts + 1
-  ifelse (random-normal level ZPD) > question ;; Can the student figure it out on their own? ;; Maybe multiply attempt value by energy %
-  [ set question 0 set attempts 0];; regain some energy when stuccessful? 
-  [ set energy energy - nrgCost]
+;;; 5% chance to not understand something, then 16% chance for it to be 2 levels higher than student.
+to read  
+  if (time = 0) [choose-activity stop]  
+  let multiplier 1
+  if (question > level)[set multiplier questionX]
+  if (partner != nobody)[set multiplier collabX]
   
-  choose-activity
-end
-
-to seek
-  face one-of professors
-  forward 1
-  if (distance one-of professors) <= 2
+  if ((1 - chanceOfLearning * multiplier) <= (random-float 1))[ 
+    set knowledge knowledge + 1 
+    set level floor(knowledge / 10)]
+  
+  ifelse ((1 - chanceOfQuestion) < (random-float 1) and question = 0)
   [
-    set state "meet";
-    ]
-end
-
-to meet
-  if (random-normal level ZPD) + help > question
-  [set question 0 set attempts 0 set state "away" set steps (random 10) + 5 set heading random 360]
-  ;;[set energy energy - ceiling(nrgCost / 2)] ;; Should the student lose energy while talking with the teacher?
-end
-
-to away
-  if steps > 0
-  [
-    forward 1
-    set steps steps - 1
+    set question ceiling(random-normal level ZPD)
+    ifelse(question > level)
+    [choose-activity]
+    [set question 0]
   ]
-  if steps = 0
-  [choose-activity]  
+  [if (level >= question) [set question 0]]
+  
+  set mentalnrg mentalnrg - mentalDrain
+  set time time - 1
 end
+;
+;to rest 
+;  set energy energy + 5
+;  if energy >= 100 ;; If we're going to rest, we're going to do it 100%!
+;  [choose-activity]
+;end
+;
+;to try
+;  set attempts attempts + 1
+;  ifelse (random-normal level ZPD) > question ;; Can the student figure it out on their own? ;; Maybe multiply attempt value by energy %
+;  [ set question 0 set attempts 0];; regain some energy when stuccessful? 
+;  [ set energy energy - nrgCost]
+;  
+;  choose-activity
+;end
+;
+;to seek
+;  face one-of professors
+;  forward 1
+;  if (distance one-of professors) <= 2
+;  [
+;    set state "meet";
+;    ]
+;end
+;
+;to meet
+;  if (random-normal level ZPD) + help > question
+;  [set question 0 set attempts 0 set state "away" set steps (random 10) + 5 set heading random 360]
+;  ;;[set energy energy - ceiling(nrgCost / 2)] ;; Should the student lose energy while talking with the teacher?
+;end
+;
+;to away
+;  if steps > 0
+;  [
+;    forward 1
+;    set steps steps - 1
+;  ]
+;  if steps = 0
+;  [choose-activity]  
+;end
+;
+;to socialize
+;  if partner = nobody
+;  [
+;    set nearest-neighbor min-one-of (other students with [state = "socialize" or state = "stuck" or state = "read"])[distance myself];; Find the closest student of the students with state
+;    set partner nearest-neighbor
+;    ask nearest-neighbor [set partner myself]    
+;  ] 
+;  ifelse (distance partner > 2)
+;  [face partner forward 1]
+;  [set state "chat"]
+;end
+;
+;to chat
+;  ;;refresh memory. Probably need to add new max-known variable or somthing
+;  ;;check to see who has higher knowledge - assign giver and receiver. 
+;  ;; Probably compare levels... 
+;end
 
-to socialize
-  if partner = nobody
-  [
-    set nearest-neighbor min-one-of (other students with [state = "socialize" or state = "stuck" or state = "read"])[distance myself];; Find the closest student of the students with state
-    set partner nearest-neighbor
-    ask nearest-neighbor [set partner myself]    
-  ] 
-  ifelse (distance partner > 2)
-  [face partner forward 1]
-  [set state "chat"]
-end
-
-to chat
-  ;;refresh memory. Probably need to add new max-known variable or somthing
-  ;;check to see who has higher knowledge - assign giver and receiver. 
-  ;; Probably compare levels... 
+to-report random-beta [alpha]
+  let x random-gamma alpha 1
+  
+  report ( x / ( x + random-gamma alpha 1) )   
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-625
-16
-1064
-476
+633
+38
+1072
+498
 16
 16
 13.0
@@ -227,10 +321,10 @@ NIL
 0
 
 PLOT
-9
-54
-592
-569
+17
+76
+600
+591
 Energy
 time
 energy
@@ -257,10 +351,10 @@ show-memory?
 -1000
 
 SLIDER
-149
-614
-321
-647
+157
+636
+329
+669
 ZPD
 ZPD
 0
@@ -272,10 +366,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-397
-602
-569
-635
+405
+624
+577
+657
 nrgCost
 nrgCost
 0
@@ -302,6 +396,24 @@ NIL
 NIL
 NIL
 1
+
+PLOT
+679
+514
+879
+664
+MentalDrain Beta
+value
+count
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"default" 1.0 1 -7858858 true "" "histogram [mentalDrain] of students"
 
 @#$#@#$#@
 ## WHAT IS IT?
