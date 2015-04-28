@@ -261,7 +261,7 @@ to consult
   if(question != 0 and time = 0)
   [
     set level min (list question (level + ZPD) )
-    if(level > question)[set question 0]
+    if(level >= question)[set question 0]
     set knowledge level * 10
     set partner nobody
     choose-activity
