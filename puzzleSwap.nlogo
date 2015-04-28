@@ -1,3 +1,8 @@
+;; end simulation at 1440
+;; scatter plot knowledge of studnets againts chance of learning
+;; code commentary
+;; Friend network?
+
 extensions [array]
 breed [students student]
 students-own[  
@@ -29,6 +34,7 @@ students-own[
   collabX
   questionX
   ;;--Preferences--
+  class ;; group of lazy vs smart for example
   restPref
   consultPref
   collabPref
@@ -47,22 +53,20 @@ to setup
   clear-all
   stop-inspecting-dead-agents
   setup-professor 
-  setup-students   
+  setup-students "A" (list 6 2 2 2)
+  setup-students "B" (list 3 3 3 3)
   reset-ticks
 end
 
-to setup-students
+to setup-students [classVal Prefs]
   set-default-shape students "person-read"
-  create-students 2
+  create-students NumStudents
   [
     setxy random-xcor random-ycor;; Distribute students in world
     
     set socialStamina 1440 ;;social energy maximum
-    set socialNrg socialStamina ;; current social energy
-    set socialDrain ceiling (10 * (random-beta 10)) ;; when socializing, rate at which energy is lost
-    ;;set socialDrain ran
+    set socialNrg socialStamina ;; current social energy    
     set socialRecover 3;; Same for all students
-    ;;set socialTime 15
     set collabTime 30
     set collabDev 15    
     set consultTime 15
@@ -70,7 +74,13 @@ to setup-students
     
     set mentalStamina 1440 ;;mental energy maximum
     set mentalNrg mentalStamina ;; current mental energy
-    set mentalDrain ceiling (10 * (random-beta 10)) ;; when studying, rate at which energy is lost
+    
+    ifelse(consumeEnergy)[
+      set mentalDrain ceiling (10 * (random-beta 10)) ;; when studying, rate at which energy is lost
+      set socialDrain ceiling (10 * (random-beta 10)) ;; when socializing, rate at which energy is lost
+    ]
+    [set mentalDrain 0 set socialDrain 0]
+     
     ;;set mentalDrain 
     set mentalRecover 3;; Same for all students
     set readTime 30;
@@ -85,21 +95,26 @@ to setup-students
     set collabX 1.1 ;; Collaborating makes learning more effective
     set questionX 1.2 ;; Studying with a question in mind makes learning more effective and draining
     
-    set restPref (random 10) + 1 ;; 1-10
-    set consultPref (random 10) + 1
-    set collabPref (random 10) + 1
-    set readPref (random 10) + 1
+    ;;set restPref (random 10) + 1 ;; 1-10
+    set restPref item 0 Prefs
+    set consultPref item 1 Prefs
+    set collabPref item 2 Prefs
+    set readPref item 3 Prefs
+    set class classVal
     
     set partner nobody
-    set state "rest"    
+    set state "rest" 
+    set color grey   
     set time 0
     set status ""
+    
   ]
   ask students [choose-activity]
-  ask students [inspect self] ;;inspect student # for all students
+  ;;ask students [inspect self] ;;inspect student # for all students
   ;;ask students [ set lambda .01]
   ;;ask students [ set mem-array array:from-list n-values 16 [0]]
 end
+
 
 to setup-professor
   set-default-shape professors "person graduate"
@@ -121,7 +136,7 @@ to choose-activity
   ;;user-message (word "choose-activity " who)
   set options []
   set time 0
-  let nearest-neighbor min-one-of (other students with [ socialNrg > (collabTime * socialDrain)and (mentalNrg > (collabTime * mentalDrain)) and (state = "read" or state = "rest")])[distance myself];; Find the closest student of the students with state
+  let nearest-neighbor min-one-of (other students with [ socialNrg > (collabTime * socialDrain)and (mentalNrg > (collabTime * mentalDrain)) and (state = "read" or state = "rest") and (partner = nobody)])[distance myself];; Find the closest student of the students with state
   let a 0
   let b 0
   let c 0
@@ -436,30 +451,15 @@ show-memory?
 -1000
 
 SLIDER
-157
-636
-329
-669
+15
+596
+187
+629
 ZPD
 ZPD
 0
 5
-2
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-405
-624
-577
-657
-nrgCost
-nrgCost
-0
-10
-10
+5
 1
 1
 NIL
@@ -557,10 +557,51 @@ true
 true
 "" ""
 PENS
-"read" 1.0 0 -16777216 true "" "plot count students with [state = \"read\"]"
+"read" 1.0 0 -16777216 true "" "plot count students with [state = \"read\" and partner = nobody]"
 "consult" 1.0 0 -7500403 true "" "plot count students with [state = \"consult\"]"
-"collab" 1.0 0 -2674135 true "" "plot count students with [state = \"collaborate\"]"
+"collab" 1.0 0 -2674135 true "" "plot count students with [is-student? partner]"
 "rest" 1.0 0 -14454117 true "" "plot count students with [state = \"rest\"]"
+
+SLIDER
+188
+597
+360
+630
+NumStudents
+NumStudents
+0
+100
+10
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+71
+645
+243
+678
+restPrefA
+restPrefA
+0
+10
+10
+1
+1
+NIL
+HORIZONTAL
+
+SWITCH
+270
+642
+413
+675
+consumeEnergy
+consumeEnergy
+0
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
