@@ -143,7 +143,7 @@ to choose-activity
   let choice (random total) + 1
    ifelse(choice > 0           and (choice <= readLim))   [set state "read" set time ceiling(random-normal mentalTime mentalDev)  ]
   [ifelse(choice > (readLim)   and (choice <= collabLim)) [set state "collaborate" set time ceiling(random-normal socialTime socialDev)]
-  [ifelse(choice > (collabLim) and (choice <= consultLim))[set state "consult"]
+  [ifelse(choice > (collabLim) and (choice <= consultLim))[set state "consult" set time ceiling(random-normal socialTime socialDev)] ;; COULD SET ANOTHER TIME AND DEVIATION PARAMETER
   [set state "rest" ;; default case
   ]]]  
   
@@ -162,7 +162,7 @@ to do-activity
       ;;-------COLLABORATE--------------------
       if (state = "collaborate") [collaborate]  
       ;;-------CONSULT----------------
-      ;;if (state = "consult") [consult]
+      if (state = "consult") [consult]
       ;;-------REST-------------
       if (state = "rest") [rest]
     ]
@@ -174,7 +174,7 @@ end
 to read  
   ;;user-message (word " to read: " who " " time )
   set mentalNrg mentalNrg - mentalDrain
-  if (time = 0 or (mentalNrg < 0)) [set partner nobody choose-activity stop]    
+  if (time <= 0 or (mentalNrg < 0)) [set partner nobody choose-activity stop]    
   let multiplier 1
   set color red
   if (question > level)[set multiplier questionX]
@@ -184,13 +184,14 @@ to read
     set knowledge knowledge + 1 
     set level floor(knowledge / 10)]
   
-  if((1 - chanceOfQuestion) < (random-float 1) and question = 0 and partner = nobody)
+  if((1 - chanceOfQuestion) < (random-float 1) and question = 0 and partner = nobody) ;; try to generate a question if I have no partner and no question
   [
-    set question ceiling(random-normal level ZPD)
-    ifelse(question > level)
-    [choose-activity stop]  ;; If the question is higher than my level choose a new activity
-    [set question 0]
-   ] ;; otherwise, ignore the question  
+    set question ceiling(random-normal level ZPD) ;; determine question difficulty
+    ifelse(question > level) [choose-activity stop]  ;; If the question is higher than my level choose a new activity
+    [set question 0] ;;Otherwise ignore the question    
+   ] 
+  
+  if(level > question)[set question 0] ;; if my lvl is higher than the question, the question is resolved.
 end
 
 to rest 
@@ -238,10 +239,7 @@ to collaborate
   if(level < [level] of partner)
   [
     set knowledge knowledge + 1
-  ]
-  
-  
-  
+  ]  
 end
 
 to move
@@ -251,41 +249,26 @@ to move
 end
 
 
+to consult
+  if(partner = nobody)
+  [ set partner one-of professors
+    set status "move"
+    set time ceiling(time + distance partner)]
+  
+  if(status = "move")
+  [move stop]
+  
+  if(question != 0 and time = 0)
+  [
+    set level min (list question (level + ZPD) )
+    if(level > question)[set question 0]
+    set knowledge level * 10
+    set partner nobody
+    choose-activity
+  ]
+  
+end
 
-
-;
-;to seek
-;  face one-of professors
-;  forward 1
-;  if (distance one-of professors) <= 2
-;  [
-;    set state "meet";
-;    ]
-;end
-;
-;to meet
-;  if (random-normal level ZPD) + help > question
-;  [set question 0 set attempts 0 set state "away" set steps (random 10) + 5 set heading random 360]
-;  ;;[set energy energy - ceiling(nrgCost / 2)] ;; Should the student lose energy while talking with the teacher?
-;end
-;
-;to away
-;  if steps > 0
-;  [
-;    forward 1
-;    set steps steps - 1
-;  ]
-;  if steps = 0
-;  [choose-activity]  
-;end
-;
-
-;
-;to chat
-;  ;;refresh memory. Probably need to add new max-known variable or somthing
-;  ;;check to see who has higher knowledge - assign giver and receiver. 
-;  ;; Probably compare levels... 
-;end
 
 to-report random-beta [alpha]
   let x random-gamma alpha 1
