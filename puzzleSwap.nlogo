@@ -35,6 +35,7 @@ students-own[
   state
   options
   time
+  status ;; an extar varible to see if the agent is moving, waiting etc.
   ]
 breed [professors professor]
 
@@ -56,14 +57,14 @@ to setup-students
     set socialNrg socialStamina ;; current social energy
     set socialDrain ceiling (10 * (random-beta 10)) ;; when socializing, rate at which energy is lost
     set socialRecover 5;; Same for all students
-    set socialTime 15
+    set socialTime 10
     set socialDev 5
     
     set mentalStamina 100 ;;mental energy maximum
     set mentalNrg socialStamina ;; current mental energy
     set mentalDrain ceiling (10 * (random-beta 10)) ;; when studying, rate at which energy is lost
     set mentalRecover 5;; Same for all students
-    set mentalTime 15;
+    set mentalTime 10;
     set mentalDev 5
     
     set chanceOfLearning random-float 1 ;; uniform distribution between 0 and 1
@@ -83,6 +84,7 @@ to setup-students
     set partner nobody
     set state "rest"    
     set time 0
+    set status ""
   ]
   ask students [choose-activity]
   ask students [inspect self] ;;inspect student # for all students
@@ -97,6 +99,7 @@ end
 
 to go
   do-activity
+  ask students [set time time - 1]
   tick
 end
 
@@ -104,7 +107,7 @@ to choose-activity
   ;;user-message (word "choose-activity " who)
   set options []
   set time 0
-  let nearest-neighbor min-one-of (other students with [ socialNrg > socialTime and (state = "read" or state = "rest")])[distance myself];; Find the closest student of the students with state
+  let nearest-neighbor min-one-of (other students with [ socialNrg > (socialTime * socialDrain)and (mentalNrg > (socialTime * mentalDrain)) and (state = "read" or state = "rest")])[distance myself];; Find the closest student of the students with state
   let a 0
   let b 0
   let c 0
@@ -116,7 +119,7 @@ to choose-activity
   ;;-------COLLABORATE--------------------
   if(nearest-neighbor != nobody)
   [    
-    if(socialNrg - ((socialTime * socialDrain) + distance nearest-neighbor)) > 0
+    if(socialNrg - ((socialTime * socialDrain) + distance nearest-neighbor)) > 0 ;; SHOULD WE CHECK METAL ENERGY AS WELL?
     [set options lput "collaborate" options
      set b 1]
   ]  
@@ -170,7 +173,8 @@ end
 
 to read  
   ;;user-message (word " to read: " who " " time )
-  if (time = 0) [set partner nobody choose-activity stop]  
+  set mentalNrg mentalNrg - mentalDrain
+  if (time = 0 or (mentalNrg < 0)) [set partner nobody choose-activity stop]    
   let multiplier 1
   set color red
   if (question > level)[set multiplier questionX]
@@ -185,9 +189,8 @@ to read
     set question ceiling(random-normal level ZPD)
     ifelse(question > level)
     [choose-activity stop]  ;; If the question is higher than my level choose a new activity
-    [set question 0]] ;; otherwise, ignore the question
-  
-  set mentalNrg mentalNrg - mentalDrain
+    [set question 0]
+   ] ;; otherwise, ignore the question  
 end
 
 to rest 
@@ -203,28 +206,52 @@ to rest
 end
 
 to collaborate
-  if(time = 0)[stop]
+  set socialNrg socialNrg - socialDrain
+  set mentalNrg mentalNrg - mentalDrain
+  
+  if(time = 0 or (socialNrg < 0) or (mentalNrg < 0))
+  [choose-activity
+   ask partner [choose-activity]
+   ask partner [set partner nobody]
+   set partner nobody
+    stop]
+  
   if partner = nobody
   [
-    set partner min-one-of (other students with [ socialNrg > socialTime and (state = "read" or state = "rest")])[distance myself];; Find the closest student of the students with state
+    set partner min-one-of (other students with [ (socialNrg > (socialTime * socialDrain)) and (mentalNrg > (socialTime * mentalDrain)) and (state = "read" or state = "rest")])[distance myself];; Find the closest student of the students with state
     ifelse(partner != nobody) ;; Just in case. I don't think this would happen... but I don't know
-    [ ask partner [set partner myself] ask partner [set state "wait"]]
-    [choose-activity stop]
-    
+    [ set status "move" 
+      set time ceiling(time + distance partner)
+      
+      ask partner [set partner myself] 
+      ask partner [set status "wait" set state "collaborate" set time [time] of partner] 
+     ]
+    [choose-activity stop]    
   ] 
   
-  if(distance partner > 2)
-  [set color blue face partner forward 1]
+  if(status = "move")
+  [move]
   
-  if([state] of partner = "wait" and (distance partner <= 2))
-    [ask partner [set state "collaborate"]]
-    
+  if(status = "wait" and (distance partner < 2))
+  [set status ""]
   
-    
-    
+  if(level < [level] of partner)
+  [
+    set knowledge knowledge + 1
+  ]
+  
   
   
 end
+
+to move
+  ifelse(distance partner > 2)
+  [set color blue face partner forward 1]
+  [set status ""]  
+end
+
+
+
 
 ;
 ;to seek
