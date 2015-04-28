@@ -6,15 +6,18 @@ students-own[
   socialNrg
   socialDrain
   socialRecover
-  socialTime ;; expected time to spend socializing
-  socialDev
+  ;;socialTime ;; expected time to spend socializing
+  consultTime
+  collabTime
+  collabDev
+  consultDev
   ;;--MENTAL energy factors--
   mentalStamina
   mentalNrg
   mentalDrain
   mentalRecover
-  mentalTime ;; expected time to spend reading
-  mentalDev
+  readTime ;; expected time to spend reading
+  readDev
   ;;--Learning factors--
   ;;ZPD slider value
   chanceOfLearning
@@ -35,7 +38,8 @@ students-own[
   state
   options
   time
-  status ;; an extar varible to see if the agent is moving, waiting etc.
+  status ;; an extra varible to see if the agent is moving, waiting etc.
+  restTimer
   ]
 breed [professors professor]
 
@@ -49,23 +53,28 @@ end
 
 to setup-students
   set-default-shape students "person-read"
-  create-students 10
+  create-students 2
   [
     setxy random-xcor random-ycor;; Distribute students in world
     
-    set socialStamina 100 ;;social energy maximum
+    set socialStamina 1440 ;;social energy maximum
     set socialNrg socialStamina ;; current social energy
     set socialDrain ceiling (10 * (random-beta 10)) ;; when socializing, rate at which energy is lost
-    set socialRecover 5;; Same for all students
-    set socialTime 10
-    set socialDev 5
+    ;;set socialDrain ran
+    set socialRecover 3;; Same for all students
+    ;;set socialTime 15
+    set collabTime 30
+    set collabDev 15    
+    set consultTime 15
+    set consultDev 5
     
-    set mentalStamina 100 ;;mental energy maximum
-    set mentalNrg socialStamina ;; current mental energy
+    set mentalStamina 1440 ;;mental energy maximum
+    set mentalNrg mentalStamina ;; current mental energy
     set mentalDrain ceiling (10 * (random-beta 10)) ;; when studying, rate at which energy is lost
-    set mentalRecover 5;; Same for all students
-    set mentalTime 10;
-    set mentalDev 5
+    ;;set mentalDrain 
+    set mentalRecover 3;; Same for all students
+    set readTime 30;
+    set readDev 5
     
     set chanceOfLearning random-float 1 ;; uniform distribution between 0 and 1
     set chanceOfQuestion random-float 1 ;;
@@ -87,7 +96,7 @@ to setup-students
     set status ""
   ]
   ask students [choose-activity]
-  ;;ask students [inspect self] ;;inspect student # for all students
+  ask students [inspect self] ;;inspect student # for all students
   ;;ask students [ set lambda .01]
   ;;ask students [ set mem-array array:from-list n-values 16 [0]]
 end
@@ -97,11 +106,14 @@ to setup-professor
   create-professors 1
 end
 
-to go
-  do-activity
+to go  
   ask students [set time time - 1]
   ask students [ if(level >= question)[set question 0]] ;; if my lvl is equal to or higher than the question, the question is resolved.
   ask students [set bestLevel max list level bestLevel]
+  ask students [if((state = "collaborate" and status = "") or state = "read" or (state = "consult" and status = "")) [set mentalNrg mentalNrg - mentalDrain ]]
+  ask students [if((partner != nobody) and status = "")[set socialNrg socialNrg - socialDrain]]
+  ;;ask students [if(stat
+  do-activity
   tick
 end
 
@@ -109,25 +121,27 @@ to choose-activity
   ;;user-message (word "choose-activity " who)
   set options []
   set time 0
-  let nearest-neighbor min-one-of (other students with [ socialNrg > (socialTime * socialDrain)and (mentalNrg > (socialTime * mentalDrain)) and (state = "read" or state = "rest")])[distance myself];; Find the closest student of the students with state
+  let nearest-neighbor min-one-of (other students with [ socialNrg > (collabTime * socialDrain)and (mentalNrg > (collabTime * mentalDrain)) and (state = "read" or state = "rest")])[distance myself];; Find the closest student of the students with state
   let a 0
   let b 0
   let c 0
   ;;-------READ---------------------------
-  if(mentalNrg - (mentalTime * mentalDrain)) > 0
+  if(mentalNrg - (readTime * mentalDrain)) > 0
   [set options lput "read" options 
    set a 1 ]
   
   ;;-------COLLABORATE--------------------
   if(nearest-neighbor != nobody)
   [    
-    if(socialNrg >= (socialTime * socialDrain + distance nearest-neighbor) and (mentalNrg > (socialTime * mentalDrain + distance nearest-neighbor))) ;; SHOULD WE CHECK METAL ENERGY AS WELL?
+    if(socialNrg >= (collabTime * socialDrain + distance nearest-neighbor) and (mentalNrg > (collabTime * mentalDrain + distance nearest-neighbor))) ;; SHOULD WE CHECK METAL ENERGY AS WELL?
     [set options lput "collaborate" options
      set b 1]
   ]  
   
   ;;-------CONSULT----------------
-  if ((mentalNrg - distance one-of professors) > 0 and (question > 0)) ;; SHOULD WE CHECK MENTAL AND SOCIAL ENERGY?
+  let prf_distance distance one-of professors
+  ;;if ((mentalNrg - distance one-of professors) > 0 and (question > 0)) ;; SHOULD WE CHECK MENTAL AND SOCIAL ENERGY?
+  if((socialNrg >= (consultTime * socialDrain + prf_distance) and (mentalNrg > (consultTime * mentalDrain + prf_distance))) and question > 0)
   [ set options lput "consult" options
     set c 1]
   
@@ -143,12 +157,14 @@ to choose-activity
   let consultLim (c * consultPref) + collabLim
   
   let choice (random total) + 1
-   ifelse(choice > 0           and (choice <= readLim))   [set state "read" set time ceiling(random-normal mentalTime mentalDev)  ]
-  [ifelse(choice > (readLim)   and (choice <= collabLim)) [set state "collaborate" set time ceiling(random-normal socialTime socialDev)]
-  [ifelse(choice > (collabLim) and (choice <= consultLim))[set state "consult" set time ceiling(random-normal socialTime socialDev)] ;; COULD SET ANOTHER TIME AND DEVIATION PARAMETER
+   ifelse(choice > 0           and (choice <= readLim))   [set state "read" set time ceiling(random-normal readTime readDev)  ]
+  [ifelse(choice > (readLim)   and (choice <= collabLim)) [set state "collaborate" set time ceiling(random-normal collabTime collabDev)]
+  [ifelse(choice > (collabLim) and (choice <= consultLim))[set state "consult" set time ceiling(random-normal consultTime consultDev)] ;; COULD SET ANOTHER TIME AND DEVIATION PARAMETER
   [set state "rest" ;; default case
   ]]]  
   
+  if(state != "rest")
+  [set restTimer 0]
   ;;user-message (word "end choose-activity: " who " is " state)
   
 ;  set level floor (knowledge / 10)
@@ -175,7 +191,7 @@ end
 
 to read  
   ;;user-message (word " to read: " who " " time )
-  set mentalNrg mentalNrg - mentalDrain
+  ;;set mentalNrg mentalNrg - mentalDrain
   if (time <= 0 or (mentalNrg <= 0)) 
   [
     choose-activity 
@@ -215,14 +231,18 @@ to rest
   ifelse((socialNrg < socialStamina) and (socialNrg + socialRecover)< socialStamina)
   [set socialNrg socialNrg + socialRecover]
   [ set socialnrg socialStamina]
+  
+  set restTimer restTimer + 1
+  if(knowledge > 0 and (random-float 1 > (.19 + .6318 * ((1 + restTimer)^ -.68))))
+    [set knowledge knowledge - 1]
   choose-activity
 end
 
 to collaborate
-  if(status = "")[set socialNrg socialNrg - socialDrain] ;; only drain social energy when together, and when setting up connection
+  ;;if(status = "")[set socialNrg socialNrg - socialDrain] ;; only drain social energy when together, and when setting up connection
   
   
-  if(time = 0 or (socialNrg <= 0) or (mentalNrg <= 0))
+  if(time <= 0 or (socialNrg <= 0) or (mentalNrg <= 0))
   [choose-activity
     if (partner != nobody) ;; need to check because it possible to enter this block before a partner is set
     [ ask partner [choose-activity]
@@ -232,7 +252,7 @@ to collaborate
   
   if partner = nobody
   [
-    set partner min-one-of (other students with [ (socialNrg > (socialTime * socialDrain)) and (mentalNrg > (socialTime * mentalDrain)) and (state = "read" or state = "rest")])[distance myself];; Find the closest student of the students with state
+    set partner min-one-of (other students with [ (socialNrg > (collabTime * socialDrain)) and (mentalNrg > (collabTime * mentalDrain)) and (state = "read" or state = "rest")])[distance myself];; Find the closest student of the students with state
     ifelse(partner != nobody) ;; Just in case. I don't think this would happen... but I don't know
     [ set status "move" 
       set time ceiling(time + distance partner)
@@ -251,7 +271,7 @@ to collaborate
   
   if(level < [level] of partner)
   [
-    set mentalNrg mentalNrg - mentalDrain
+    ;;set mentalNrg mentalNrg - mentalDrain
     set knowledge knowledge + 1
     set level floor(knowledge / 10)
     set color red
@@ -263,7 +283,7 @@ to collaborate
     if(level < bestLevel)
     [set knowledge knowledge + 1 set level floor(knowledge / 10)]
     
-    set mentalNrg mentalNrg - mentalDrain
+    ;;set mentalNrg mentalNrg - mentalDrain
   ]
   
   if(level = [level] of partner and status = "")
@@ -285,6 +305,14 @@ end
 
 
 to consult
+  
+  if(time <= 0 or (socialNrg <= 0) or (mentalNrg <= 0))
+  [choose-activity
+    if (partner != nobody) ;; need to check because it possible to enter this block before a partner is set
+    [set partner nobody]
+    stop
+  ]
+  
   if(partner = nobody and question != 0)
   [ set partner one-of professors
     set status "move"
@@ -293,13 +321,13 @@ to consult
   if(status = "move" and time > 0)
   [move stop]
   
-  if(question != 0 and time <= 0)
+  if(question != 0)
   [
     set level min (list question (level + ZPD) )
     if(level >= question)[set question 0]
     set knowledge level * 10
     set partner nobody
-    set time random 15;; time to move away from prof
+    set time random 10 + 5;; time to move away from prof
     set heading random 360
     set status "move"
   ]
