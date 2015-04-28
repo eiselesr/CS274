@@ -101,25 +101,22 @@ to go
 end
 
 to choose-activity  
+  ;;user-message (word "choose-activity " who)
   set options []
-  let nearest-neighbor min-one-of (other students with [state = "read" or state = "rest"])[distance myself];; Find the closest student of the students with state
+  set time 0
+  let nearest-neighbor min-one-of (other students with [ socialNrg > socialTime and (state = "read" or state = "rest")])[distance myself];; Find the closest student of the students with state
   let a 0
   let b 0
   let c 0
   ;;-------READ---------------------------
-  if(mentalNrg - mentalTime) > 0
+  if(mentalNrg - (mentalTime * mentalDrain)) > 0
   [set options lput "read" options 
    set a 1 ]
   
   ;;-------COLLABORATE--------------------
-  ifelse(nearest-neighbor = nobody)
-  [
-    if(socialNrg - socialTime) > 0
-    [set options lput "collaborate" options
-     set b 1]
-  ]
+  if(nearest-neighbor != nobody)
   [    
-    if(socialNrg - (socialTime + distance nearest-neighbor)) > 0
+    if(socialNrg - ((socialTime * socialDrain) + distance nearest-neighbor)) > 0
     [set options lput "collaborate" options
      set b 1]
   ]  
@@ -142,10 +139,12 @@ to choose-activity
   
   let choice (random total) + 1
    ifelse(choice > 0           and (choice <= readLim))   [set state "read" set time ceiling(random-normal mentalTime mentalDev)  ]
-  [ifelse(choice > (readLim)   and (choice <= collabLim)) [set state "collaborate" set time ceiling(random-normal socialTime socialDev)  ]
+  [ifelse(choice > (readLim)   and (choice <= collabLim)) [set state "collaborate" set time ceiling(random-normal socialTime socialDev)]
   [ifelse(choice > (collabLim) and (choice <= consultLim))[set state "consult"]
   [set state "rest" ;; default case
   ]]]  
+  
+  ;;user-message (word "end choose-activity: " who " is " state)
   
 ;  set level floor (knowledge / 10)
 end
@@ -158,23 +157,22 @@ to do-activity
       ;;-------READ-------------
       if (state = "read") [read]
       ;;-------COLLABORATE--------------------
-      ;;if (state = "collaborate") [collaborate]  
+      if (state = "collaborate") [collaborate]  
       ;;-------CONSULT----------------
       ;;if (state = "consult") [consult]
       ;;-------REST-------------
-      ;;if (state = "rest") [rest]
-      ;;-------MOVE------------
-      ;;if (state = "move") [move]
+      if (state = "rest") [rest]
     ]
   ]
   
 end
 
 
-;;; 5% chance to not understand something, then 16% chance for it to be 2 levels higher than student.
 to read  
-  if (time = 0) [choose-activity stop]  
+  ;;user-message (word " to read: " who " " time )
+  if (time = 0) [set partner nobody choose-activity stop]  
   let multiplier 1
+  set color red
   if (question > level)[set multiplier questionX]
   if (partner != nobody)[set multiplier collabX]
   
@@ -182,33 +180,52 @@ to read
     set knowledge knowledge + 1 
     set level floor(knowledge / 10)]
   
-  ifelse ((1 - chanceOfQuestion) < (random-float 1) and question = 0)
+  if((1 - chanceOfQuestion) < (random-float 1) and question = 0 and partner = nobody)
   [
     set question ceiling(random-normal level ZPD)
     ifelse(question > level)
-    [choose-activity]
-    [set question 0]
-  ]
-  [if (level >= question) [set question 0]]
+    [choose-activity stop]  ;; If the question is higher than my level choose a new activity
+    [set question 0]] ;; otherwise, ignore the question
   
-  set mentalnrg mentalnrg - mentalDrain
-  set time time - 1
+  set mentalNrg mentalNrg - mentalDrain
 end
-;
-;to rest 
-;  set energy energy + 5
-;  if energy >= 100 ;; If we're going to rest, we're going to do it 100%!
-;  [choose-activity]
-;end
-;
-;to try
-;  set attempts attempts + 1
-;  ifelse (random-normal level ZPD) > question ;; Can the student figure it out on their own? ;; Maybe multiply attempt value by energy %
-;  [ set question 0 set attempts 0];; regain some energy when stuccessful? 
-;  [ set energy energy - nrgCost]
-;  
-;  choose-activity
-;end
+
+to rest 
+  set color grey
+  ifelse((mentalNrg < mentalStamina) and (mentalNrg + mentalRecover)< mentalStamina)
+  [ set mentalnrg mentalnrg + mentalRecover]
+  [ set mentalnrg mentalStamina]
+  
+  ifelse((socialNrg < socialStamina) and (socialNrg + socialRecover)< socialStamina)
+  [set socialNrg socialNrg + socialRecover]
+  [ set socialnrg socialStamina]
+  choose-activity
+end
+
+to collaborate
+  if(time = 0)[stop]
+  if partner = nobody
+  [
+    set partner min-one-of (other students with [ socialNrg > socialTime and (state = "read" or state = "rest")])[distance myself];; Find the closest student of the students with state
+    ifelse(partner != nobody) ;; Just in case. I don't think this would happen... but I don't know
+    [ ask partner [set partner myself] ask partner [set state "wait"]]
+    [choose-activity stop]
+    
+  ] 
+  
+  if(distance partner > 2)
+  [set color blue face partner forward 1]
+  
+  if([state] of partner = "wait" and (distance partner <= 2))
+    [ask partner [set state "collaborate"]]
+    
+  
+    
+    
+  
+  
+end
+
 ;
 ;to seek
 ;  face one-of professors
@@ -235,17 +252,7 @@ end
 ;  [choose-activity]  
 ;end
 ;
-;to socialize
-;  if partner = nobody
-;  [
-;    set nearest-neighbor min-one-of (other students with [state = "socialize" or state = "stuck" or state = "read"])[distance myself];; Find the closest student of the students with state
-;    set partner nearest-neighbor
-;    ask nearest-neighbor [set partner myself]    
-;  ] 
-;  ifelse (distance partner > 2)
-;  [face partner forward 1]
-;  [set state "chat"]
-;end
+
 ;
 ;to chat
 ;  ;;refresh memory. Probably need to add new max-known variable or somthing
