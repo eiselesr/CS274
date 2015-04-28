@@ -49,7 +49,7 @@ end
 
 to setup-students
   set-default-shape students "person-read"
-  create-students 2
+  create-students 10
   [
     setxy random-xcor random-ycor;; Distribute students in world
     
@@ -87,7 +87,7 @@ to setup-students
     set status ""
   ]
   ask students [choose-activity]
-  ask students [inspect self] ;;inspect student # for all students
+  ;;ask students [inspect self] ;;inspect student # for all students
   ;;ask students [ set lambda .01]
   ;;ask students [ set mem-array array:from-list n-values 16 [0]]
 end
