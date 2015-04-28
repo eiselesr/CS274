@@ -49,7 +49,7 @@ end
 
 to setup-students
   set-default-shape students "person-read"
-  create-students 10
+  create-students 2
   [
     setxy random-xcor random-ycor;; Distribute students in world
     
@@ -87,7 +87,7 @@ to setup-students
     set status ""
   ]
   ask students [choose-activity]
-;  ask students [inspect self] ;;inspect student # for all students
+  ask students [inspect self] ;;inspect student # for all students
   ;;ask students [ set lambda .01]
   ;;ask students [ set mem-array array:from-list n-values 16 [0]]
 end
@@ -100,6 +100,7 @@ end
 to go
   do-activity
   ask students [set time time - 1]
+  ask students [ if(level >= question)[set question 0]] ;; if my lvl is equal to or higher than the question, the question is resolved.
   tick
 end
 
@@ -191,7 +192,7 @@ to read
     [set question 0] ;;Otherwise ignore the question    
    ] 
   
-  if(level > question)[set question 0] ;; if my lvl is higher than the question, the question is resolved.
+  
 end
 
 to rest 
@@ -212,10 +213,11 @@ to collaborate
   
   if(time = 0 or (socialNrg < 0) or (mentalNrg < 0))
   [choose-activity
-   ask partner [choose-activity]
-   ask partner [set partner nobody]
-   set partner nobody
-    stop]
+    if (partner != nobody) ;; need to check because it possible to enter this block before a partner is set
+    [ ask partner [choose-activity]
+      ask partner [set partner nobody]
+      set partner nobody
+      stop]]
   
   if partner = nobody
   [
@@ -239,7 +241,14 @@ to collaborate
   if(level < [level] of partner)
   [
     set knowledge knowledge + 1
+    set level floor(knowledge / 10)
+    set color red
   ]  
+  
+  if(level > [level] of partner)
+  [set color green]
+  
+  
 end
 
 to move
