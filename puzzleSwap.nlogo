@@ -49,7 +49,7 @@ end
 
 to setup-students
   set-default-shape students "person-read"
-  create-students 2
+  create-students 10
   [
     setxy random-xcor random-ycor;; Distribute students in world
     
@@ -87,7 +87,7 @@ to setup-students
     set status ""
   ]
   ask students [choose-activity]
-  ask students [inspect self] ;;inspect student # for all students
+;  ask students [inspect self] ;;inspect student # for all students
   ;;ask students [ set lambda .01]
   ;;ask students [ set mem-array array:from-list n-values 16 [0]]
 end
@@ -353,8 +353,8 @@ true
 false
 "" ""
 PENS
-"energy0" 1.0 0 -16777216 true "" "plot [energy] of turtle 0"
-"energy1" 1.0 0 -987046 true "" "plot [energy] of turtle 1"
+"mnrg1" 1.0 0 -4699768 true "" "plot [mentalNrg] of student 1"
+"mnrg2" 1.0 0 -11221820 true "" "plot [mentalNrg] of student 2"
 
 SWITCH
 147
@@ -363,7 +363,7 @@ SWITCH
 43
 show-memory?
 show-memory?
-0
+1
 1
 -1000
 
@@ -431,6 +431,68 @@ true
 "" ""
 PENS
 "default" 1.0 1 -7858858 true "" "histogram [mentalDrain] of students"
+
+PLOT
+910
+512
+1110
+662
+Knowledge level of students
+time
+knowledge
+0.0
+50.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"s1" 1.0 0 -4699768 true "" "plot [knowledge] of student 1"
+"s2" 1.0 0 -13791810 true "" "plot [knowledge] of student 2"
+"mean" 1.0 0 -7500403 true "" "plot mean [knowledge] of students"
+
+PLOT
+1131
+513
+1399
+663
+# in activity now
+activity
+# students
+0.0
+10.0
+0.0
+10.0
+false
+true
+"" "clear-plot"
+PENS
+"read" 1.0 1 -16777216 true "" "plotxy 1 count students with [state = \"read\"]"
+"consult" 1.0 1 -7500403 true "" "plotxy 3 count students with [state = \"consult\"]"
+"collab" 1.0 1 -2674135 true "" "plotxy 5 count students with [state = \"collaborate\" ]"
+"rest" 1.0 1 -14454117 true "" "plotxy 7 count students with [state = \"rest\"]"
+
+PLOT
+1131
+354
+1399
+504
+# in activity
+time
+# students
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"read" 1.0 0 -16777216 true "" "plot count students with [state = \"read\"]"
+"consult" 1.0 0 -7500403 true "" "plot count students with [state = \"consult\"]"
+"collab" 1.0 0 -2674135 true "" "plot count students with [state = \"collaborate\"]"
+"rest" 1.0 0 -14454117 true "" "plot count students with [state = \"rest\"]"
 
 @#$#@#$#@
 ## WHAT IS IT?
