@@ -2,6 +2,9 @@
 ;; scatter plot knowledge of studnets againts chance of learning
 ;; code commentary
 ;; Friend network?
+;; color students based on type
+;; look over slides and paper
+;; try for more realistic behavior
 
 extensions [array]
 breed [students student]
@@ -53,12 +56,12 @@ to setup
   clear-all
   stop-inspecting-dead-agents
   setup-professor 
-  setup-students "A" (list 6 2 2 2)
-  setup-students "B" (list 3 3 3 3)
+  setup-students "A" (list 6 2 2 2) 10
+  setup-students "B" (list 3 3 3 3) 10
   reset-ticks
 end
 
-to setup-students [classVal Prefs]
+to setup-students [classVal Prefs NumStudents]
   set-default-shape students "person-read"
   create-students NumStudents
   [
@@ -561,36 +564,6 @@ PENS
 "consult" 1.0 0 -7500403 true "" "plot count students with [state = \"consult\"]"
 "collab" 1.0 0 -2674135 true "" "plot count students with [is-student? partner]"
 "rest" 1.0 0 -14454117 true "" "plot count students with [state = \"rest\"]"
-
-SLIDER
-188
-597
-360
-630
-NumStudents
-NumStudents
-0
-100
-10
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-71
-645
-243
-678
-restPrefA
-restPrefA
-0
-10
-10
-1
-1
-NIL
-HORIZONTAL
 
 SWITCH
 270
