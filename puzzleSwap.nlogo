@@ -101,6 +101,7 @@ to go
   do-activity
   ask students [set time time - 1]
   ask students [ if(level >= question)[set question 0]] ;; if my lvl is equal to or higher than the question, the question is resolved.
+  ask students [set bestLevel max list level bestLevel]
   tick
 end
 
@@ -120,7 +121,7 @@ to choose-activity
   ;;-------COLLABORATE--------------------
   if(nearest-neighbor != nobody)
   [    
-    if(socialNrg - ((socialTime * socialDrain) + distance nearest-neighbor)) > 0 ;; SHOULD WE CHECK METAL ENERGY AS WELL?
+    if(socialNrg >= (socialTime * socialDrain + distance nearest-neighbor) and (mentalNrg > (socialTime * mentalDrain + distance nearest-neighbor))) ;; SHOULD WE CHECK METAL ENERGY AS WELL?
     [set options lput "collaborate" options
      set b 1]
   ]  
@@ -175,7 +176,17 @@ end
 to read  
   ;;user-message (word " to read: " who " " time )
   set mentalNrg mentalNrg - mentalDrain
-  if (time <= 0 or (mentalNrg < 0)) [set partner nobody choose-activity stop]    
+  if (time <= 0 or (mentalNrg <= 0)) 
+  [
+    choose-activity 
+    if (partner != nobody) ;; 
+    [ ask partner [choose-activity]
+      ask partner [set partner nobody]
+      set partner nobody
+    ]
+    stop
+  ]
+      
   let multiplier 1
   set color red
   if (question > level)[set multiplier questionX]
@@ -208,10 +219,10 @@ to rest
 end
 
 to collaborate
-  set socialNrg socialNrg - socialDrain
-  set mentalNrg mentalNrg - mentalDrain
+  if(status = "")[set socialNrg socialNrg - socialDrain] ;; only drain social energy when together, and when setting up connection
   
-  if(time = 0 or (socialNrg < 0) or (mentalNrg < 0))
+  
+  if(time = 0 or (socialNrg <= 0) or (mentalNrg <= 0))
   [choose-activity
     if (partner != nobody) ;; need to check because it possible to enter this block before a partner is set
     [ ask partner [choose-activity]
@@ -240,41 +251,61 @@ to collaborate
   
   if(level < [level] of partner)
   [
+    set mentalNrg mentalNrg - mentalDrain
     set knowledge knowledge + 1
     set level floor(knowledge / 10)
     set color red
   ]  
   
   if(level > [level] of partner)
-  [set color green]
+  [
+    set color green 
+    if(level < bestLevel)
+    [set knowledge knowledge + 1 set level floor(knowledge / 10)]
+    
+    set mentalNrg mentalNrg - mentalDrain
+  ]
   
+  if(level = [level] of partner and status = "")
+  [set state "read"]
   
 end
 
 to move
-  ifelse(distance partner > 2)
-  [set color blue face partner forward 1]
-  [set status ""]  
+  if(partner = nobody)
+  [set color blue forward 1]
+  
+  if(partner != nobody)
+  [
+    ifelse(distance partner > 2)
+    [set color blue face partner forward 1]
+    [set status ""]  
+  ]
 end
 
 
 to consult
-  if(partner = nobody)
+  if(partner = nobody and question != 0)
   [ set partner one-of professors
     set status "move"
     set time ceiling(time + distance partner)]
   
-  if(status = "move")
+  if(status = "move" and time > 0)
   [move stop]
   
-  if(question != 0 and time = 0)
+  if(question != 0 and time <= 0)
   [
     set level min (list question (level + ZPD) )
     if(level >= question)[set question 0]
     set knowledge level * 10
     set partner nobody
-    choose-activity
+    set time random 15;; time to move away from prof
+    set heading random 360
+    set status "move"
   ]
+  
+  if(question = 0 and time <= 0)
+  [choose-activity] 
   
 end
 
