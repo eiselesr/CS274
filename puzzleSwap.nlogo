@@ -56,8 +56,9 @@ to setup
   clear-all
   stop-inspecting-dead-agents
   setup-professor 
-  setup-students "A" preflist-A numA red
-  setup-students "B" preflist-B numB blue
+;;  setup-students "A" preflist-A numA red
+  setup-students "A" (list A1 A2 A3 A4) numA red
+  setup-students "B" (list B1 B2 B3 B4) numB blue
   reset-ticks
 end
 
@@ -134,7 +135,7 @@ to go
   ;;ask students [if(stat
   do-activity
   tick
-  if(ticks > 1440)[stop]
+  ;; if(ticks > 1440)[stop]
 end
 
 to choose-activity  
@@ -378,10 +379,10 @@ to plot-QuestionChanceVsKnowledge
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-21
-203
-354
-557
+20
+293
+353
+647
 16
 16
 9.8
@@ -617,26 +618,6 @@ PENS
 "A" 1.0 2 -2674135 true "" ""
 "B" 1.0 2 -13791810 true "" ""
 
-CHOOSER
-20
-144
-141
-189
-preflist-A
-preflist-A
-[6 2 2 2] [6 1 4 1] [6 1 1 4] [3 3 3 3] [3 2 5 2] [3 2 2 5]
-0
-
-CHOOSER
-150
-144
-271
-189
-preflist-B
-preflist-B
-[6 2 2 2] [6 1 4 1] [6 1 1 4] [3 3 3 3] [3 2 5 2] [3 2 2 5]
-0
-
 SLIDER
 20
 86
@@ -666,16 +647,6 @@ numB
 1
 NIL
 HORIZONTAL
-
-TEXTBOX
-38
-127
-250
-155
-SET: [Rest, Consult, Collaborate, Read]
-11
-0.0
-1
 
 TEXTBOX
 38
@@ -744,6 +715,136 @@ Live Monitors
 16
 32.0
 1
+
+SLIDER
+87
+129
+179
+162
+A1
+A1
+1
+12
+2
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+87
+171
+179
+204
+A2
+A2
+1
+12
+3
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+86
+213
+178
+246
+A3
+A3
+1
+12
+3
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+86
+254
+178
+287
+A4
+A4
+1
+12
+3
+1
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+20
+131
+98
+271
+1. Read\n\n\n2. Consult\n\n\n3. Collab\n\n\n4. Rest
+11
+0.0
+1
+
+SLIDER
+184
+130
+276
+163
+B1
+B1
+1
+12
+3
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+184
+171
+276
+204
+B2
+B2
+1
+12
+2
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+185
+213
+277
+246
+B3
+B3
+1
+12
+3
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+185
+255
+277
+288
+B4
+B4
+1
+12
+3
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1135,6 +1236,42 @@ NetLogo 5.2.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="1class knowledge by prefs" repetitions="10" runMetricsEveryStep="false">
+    <setup>random-seed 1000
+setup</setup>
+    <go>go</go>
+    <metric>mean [knowledge] of students</metric>
+    <enumeratedValueSet variable="consumeEnergy">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ZPD">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numA">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A1">
+      <value value="2"/>
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A2">
+      <value value="6"/>
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A3">
+      <value value="6"/>
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A4">
+      <value value="6"/>
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numB">
+      <value value="0"/>
+    </enumeratedValueSet>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
