@@ -1,5 +1,5 @@
-;; end simulation at 1440
-;; scatter plot knowledge of studnets againts chance of learning
+;; end simulation at 1440 - done
+;; scatter plot knowledge of studnets againts chance of learning - done
 ;; code commentary
 ;; Friend network?
 ;; color students based on type
@@ -130,9 +130,11 @@ to go
   ask students [set bestLevel max list level bestLevel]
   ask students [if((state = "collaborate" and status = "") or state = "read" or (state = "consult" and status = "")) [set mentalNrg mentalNrg - mentalDrain ]]
   ask students [if((partner != nobody) and status = "")[set socialNrg socialNrg - socialDrain]]
+  plot-LearnChanceVsKnowledge
   ;;ask students [if(stat
   do-activity
   tick
+  if(ticks > 1440)[stop]
 end
 
 to choose-activity  
@@ -361,15 +363,25 @@ to-report random-beta [alpha]
   
   report ( x / ( x + random-gamma alpha 1) )   
 end
+
+to plot-LearnChanceVsKnowledge
+  clear-plot
+  ask students [set-current-plot-pen class plotxy chanceofLearning knowledge]
+end
+
+to plot-QuestionChanceVsKnowledge
+  clear-plot
+  ask students [set-current-plot-pen class plotxy chanceofQuestion knowledge]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
-633
-38
-1072
-498
+865
+10
+1198
+364
 16
 16
-13.0
+9.8
 1
 10
 1
@@ -424,10 +436,10 @@ NIL
 0
 
 PLOT
-17
-76
-600
-591
+10
+493
+179
+661
 Energy
 time
 energy
@@ -442,22 +454,11 @@ PENS
 "mnrg1" 1.0 0 -4699768 true "" "plot [mentalNrg] of student 1"
 "mnrg2" 1.0 0 -11221820 true "" "plot [mentalNrg] of student 2"
 
-SWITCH
-147
-10
-286
-43
-show-memory?
-show-memory?
-1
-1
--1000
-
 SLIDER
-15
-596
-187
-629
+225
+10
+397
+43
 ZPD
 ZPD
 0
@@ -469,9 +470,9 @@ NIL
 HORIZONTAL
 
 BUTTON
-288
+149
 10
-363
+224
 43
 go once
 go
@@ -486,10 +487,10 @@ NIL
 1
 
 PLOT
-679
-514
-879
-664
+209
+508
+409
+658
 MentalDrain Beta
 value
 count
@@ -504,10 +505,10 @@ PENS
 "default" 1.0 1 -7858858 true "" "histogram [mentalDrain] of students"
 
 PLOT
-910
-512
-1110
-662
+440
+506
+640
+656
 Knowledge level of students
 time
 knowledge
@@ -524,10 +525,10 @@ PENS
 "mean" 1.0 0 -7500403 true "" "plot mean [knowledge] of students"
 
 PLOT
-1131
-513
-1399
-663
+652
+502
+920
+652
 # in activity now
 activity
 # students
@@ -545,10 +546,10 @@ PENS
 "rest" 1.0 1 -14454117 true "" "plotxy 7 count students with [state = \"rest\"]"
 
 PLOT
-1131
-354
-1399
-504
+926
+500
+1194
+650
 # in activity
 time
 # students
@@ -566,15 +567,53 @@ PENS
 "rest" 1.0 0 -14454117 true "" "plot count students with [state = \"rest\"]"
 
 SWITCH
-270
-642
-413
-675
+398
+10
+541
+43
 consumeEnergy
 consumeEnergy
 0
 1
 -1000
+
+PLOT
+11
+48
+399
+424
+Chance of Learning VS. Knowledge
+chanceOfLearning
+knowledge
+0.0
+1.0
+0.0
+10.0
+true
+true
+"" "plot-LearnChanceVsKnowledge"
+PENS
+"A" 1.0 2 -2674135 true "" ""
+"B" 1.0 2 -13791810 true "" ""
+
+PLOT
+401
+48
+797
+423
+Chance of Question VS. Knowledge
+NIL
+NIL
+0.0
+1.0
+0.0
+10.0
+true
+true
+"" "plot-QuestionChanceVsKnowledge"
+PENS
+"A" 1.0 2 -2674135 true "" ""
+"B" 1.0 2 -13791810 true "" ""
 
 @#$#@#$#@
 ## WHAT IS IT?
