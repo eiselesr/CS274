@@ -58,8 +58,8 @@ to setup
   clear-all
   stop-inspecting-dead-agents
   setup-professor 
-  setup-students "A" (list 6 2 2 2) 10 red
-  setup-students "B" (list 3 3 3 3) 10 blue
+  setup-students "A" preflist-A numA red
+  setup-students "B" preflist-B numB blue
   reset-ticks
 end
 
@@ -437,6 +437,7 @@ end
 ;;-------------------------------------------------------------
 to plot-LearnChanceVsKnowledge
   clear-plot
+  set-current-plot "LearnChanceVsKnowledge"
   ask students [set-current-plot-pen class plotxy chanceofLearning knowledge]
 end
 
@@ -446,10 +447,10 @@ to plot-QuestionChanceVsKnowledge
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-865
-10
-1198
-364
+21
+203
+354
+557
 16
 16
 9.8
@@ -507,11 +508,11 @@ NIL
 0
 
 PLOT
-10
-493
-179
-661
-Energy
+624
+72
+1008
+295
+Average Energy levels over time
 time
 energy
 0.0
@@ -519,11 +520,11 @@ energy
 0.0
 10.0
 true
-false
+true
 "" ""
 PENS
-"mnrg1" 1.0 0 -4699768 true "" "plot [mentalNrg] of student 1"
-"mnrg2" 1.0 0 -11221820 true "" "plot [mentalNrg] of student 2"
+"mental-A" 1.0 0 -16777216 true "" "plot mean [mentalNrg] of students"
+"social-A" 1.0 0 -408670 true "" "plot mean [socialNrg] of students"
 
 SLIDER
 225
@@ -558,11 +559,11 @@ NIL
 1
 
 PLOT
-209
-508
-409
-658
-MentalDrain Beta
+279
+70
+439
+190
+MentalDrain
 value
 count
 0.0
@@ -570,17 +571,17 @@ count
 0.0
 10.0
 true
-true
+false
 "" ""
 PENS
 "default" 1.0 1 -7858858 true "" "histogram [mentalDrain] of students"
 
 PLOT
-440
-506
-640
-656
-Knowledge level of students
+364
+238
+611
+388
+Knowledge Change
 time
 knowledge
 0.0
@@ -592,14 +593,13 @@ true
 "" ""
 PENS
 "s1" 1.0 0 -4699768 true "" "plot [knowledge] of student 1"
-"s2" 1.0 0 -13791810 true "" "plot [knowledge] of student 2"
-"mean" 1.0 0 -7500403 true "" "plot mean [knowledge] of students"
+"mean-ALL" 1.0 0 -7500403 true "" "plot mean [knowledge] of students"
 
 PLOT
-652
-502
-920
-652
+364
+401
+612
+551
 # in activity now
 activity
 # students
@@ -607,7 +607,7 @@ activity
 10.0
 0.0
 10.0
-false
+true
 true
 "" "clear-plot"
 PENS
@@ -617,25 +617,25 @@ PENS
 "rest" 1.0 1 -14454117 true "" "plotxy 7 count students with [state = \"rest\"]"
 
 PLOT
-926
-500
-1194
-650
-# in activity
+624
+308
+1009
+551
+# of "A" students in each activity
 time
-# students
+count
 0.0
-10.0
+1450.0
 0.0
 10.0
 true
 true
 "" ""
 PENS
-"read" 1.0 0 -16777216 true "" "plot count students with [state = \"read\" and partner = nobody]"
-"consult" 1.0 0 -7500403 true "" "plot count students with [state = \"consult\"]"
-"collab" 1.0 0 -2674135 true "" "plot count students with [is-student? partner]"
-"rest" 1.0 0 -14454117 true "" "plot count students with [state = \"rest\"]"
+"read" 1.0 0 -16777216 true "" "plot count students with [class = \"A\" and state = \"read\" and partner = nobody]"
+"consult" 1.0 0 -8630108 true "" "plot count students with [class = \"A\" and state = \"consult\"]"
+"collab" 1.0 0 -817084 true "" "plot count students with [class = \"A\" and is-student? partner]"
+"rest" 1.0 0 -10899396 true "" "plot count students with [class = \"A\" and state = \"rest\"]"
 
 SWITCH
 398
@@ -649,17 +649,17 @@ consumeEnergy
 -1000
 
 PLOT
-11
-48
-399
-424
-Chance of Learning VS. Knowledge
+1021
+72
+1322
+294
+LearnChanceVsKnowledge
 chanceOfLearning
 knowledge
 0.0
 1.0
 0.0
-10.0
+400.0
 true
 true
 "" "plot-LearnChanceVsKnowledge"
@@ -668,23 +668,151 @@ PENS
 "B" 1.0 2 -13791810 true "" ""
 
 PLOT
-401
-48
-797
-423
-Chance of Question VS. Knowledge
+1021
+307
+1323
+526
+Chance of Question
 NIL
 NIL
 0.0
 1.0
 0.0
-10.0
+400.0
 true
 true
 "" "plot-QuestionChanceVsKnowledge"
 PENS
 "A" 1.0 2 -2674135 true "" ""
 "B" 1.0 2 -13791810 true "" ""
+
+CHOOSER
+20
+144
+141
+189
+preflist-A
+preflist-A
+[6 2 2 2] [6 1 4 1] [6 1 1 4] [3 3 3 3] [3 2 5 2] [3 2 2 5]
+0
+
+CHOOSER
+150
+144
+271
+189
+preflist-B
+preflist-B
+[6 2 2 2] [6 1 4 1] [6 1 1 4] [3 3 3 3] [3 2 5 2] [3 2 2 5]
+0
+
+SLIDER
+20
+86
+141
+119
+numA
+numA
+0
+50
+20
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+149
+86
+270
+119
+numB
+numB
+0
+50
+0
+1
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+38
+127
+250
+155
+SET: [Rest, Consult, Collaborate, Read]
+11
+0.0
+1
+
+TEXTBOX
+38
+70
+245
+98
+SET: number of red and blue students
+11
+0.0
+1
+
+PLOT
+448
+71
+608
+191
+SocialDrain
+value
+count
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 1 -16777216 true "" "histogram [socialDrain] of students"
+
+TEXTBOX
+1027
+26
+1304
+69
+How does final knowledge depend on Individual characteristics?
+16
+32.0
+0
+
+TEXTBOX
+649
+31
+1005
+91
+How does activity choice change over time?
+16
+32.0
+1
+
+TEXTBOX
+625
+559
+1030
+584
+How does final knowledge depend on preferences?
+16
+33.0
+1
+
+TEXTBOX
+432
+207
+582
+227
+Live Monitors
+16
+32.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
