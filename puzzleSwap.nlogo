@@ -368,6 +368,7 @@ end
 
 to plot-LearnChanceVsKnowledge
   clear-plot
+  set-current-plot "LearnChanceVsKnowledge"
   ask students [set-current-plot-pen class plotxy chanceofLearning knowledge]
 end
 
@@ -453,10 +454,8 @@ true
 true
 "" ""
 PENS
-"A mental" 1.0 0 -5298144 true "" "plot mean [mentalNrg] of students with [class = \"A\"]"
-"A social" 1.0 0 -1604481 true "" "plot mean [socialNrg] of students with [class = \"A\"]"
-"B mental" 1.0 0 -14454117 true "" "plot mean [mentalNrg] of students with [class = \"B\"]"
-"B social" 1.0 0 -11033397 true "" "plot mean [socialNrg] of students with [class = \"B\"]"
+"mental-A" 1.0 0 -16777216 true "" "plot mean [mentalNrg] of students"
+"social-A" 1.0 0 -408670 true "" "plot mean [socialNrg] of students"
 
 SLIDER
 225
@@ -525,7 +524,6 @@ true
 "" ""
 PENS
 "s1" 1.0 0 -4699768 true "" "plot [knowledge] of student 1"
-"s2" 1.0 0 -13791810 true "" "plot [knowledge] of student 2"
 "mean-ALL" 1.0 0 -7500403 true "" "plot mean [knowledge] of students"
 
 PLOT
@@ -565,7 +563,7 @@ true
 true
 "" ""
 PENS
-"read" 1.0 0 -9276814 true "" "plot count students with [class = \"A\" and state = \"read\" and partner = nobody]"
+"read" 1.0 0 -16777216 true "" "plot count students with [class = \"A\" and state = \"read\" and partner = nobody]"
 "consult" 1.0 0 -8630108 true "" "plot count students with [class = \"A\" and state = \"consult\"]"
 "collab" 1.0 0 -817084 true "" "plot count students with [class = \"A\" and is-student? partner]"
 "rest" 1.0 0 -10899396 true "" "plot count students with [class = \"A\" and state = \"rest\"]"
@@ -586,7 +584,7 @@ PLOT
 72
 1322
 294
-Chance of Learning
+LearnChanceVsKnowledge
 chanceOfLearning
 knowledge
 0.0
@@ -663,7 +661,7 @@ numB
 numB
 0
 50
-1
+0
 1
 1
 NIL
