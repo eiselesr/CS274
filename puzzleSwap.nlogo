@@ -2,7 +2,7 @@
 ;; scatter plot knowledge of studnets againts chance of learning - done
 ;; code commentary
 ;; Friend network?
-;; color students based on type
+;; color students based on type - done
 ;; look over slides and paper
 ;; try for more realistic behavior
 
@@ -56,12 +56,12 @@ to setup
   clear-all
   stop-inspecting-dead-agents
   setup-professor 
-  setup-students "A" (list 6 2 2 2) 10
-  setup-students "B" (list 3 3 3 3) 10
+  setup-students "A" (list 6 2 2 2) 10 red
+  setup-students "B" (list 3 3 3 3) 10 blue
   reset-ticks
 end
 
-to setup-students [classVal Prefs NumStudents]
+to setup-students [classVal Prefs NumStudents visual]
   set-default-shape students "person-read"
   create-students NumStudents
   [
@@ -104,13 +104,13 @@ to setup-students [classVal Prefs NumStudents]
     set collabPref item 2 Prefs
     set readPref item 3 Prefs
     set class classVal
+    set color visual
     
     set partner nobody
     set state "rest" 
-    set color grey   
+    ;; set color grey   
     set time 0
-    set status ""
-    
+    set status ""    
   ]
   ask students [choose-activity]
   ;;ask students [inspect self] ;;inspect student # for all students
@@ -224,7 +224,7 @@ to read
   ]
       
   let multiplier 1
-  set color red
+  ;; set color red
   if (question > level)[set multiplier questionX]
   if (partner != nobody)[set multiplier collabX]
   
@@ -243,7 +243,7 @@ to read
 end
 
 to rest 
-  set color grey
+  ;; set color grey
   ifelse((mentalNrg < mentalStamina) and (mentalNrg + mentalRecover)< mentalStamina)
   [ set mentalnrg mentalnrg + mentalRecover]
   [ set mentalnrg mentalStamina]
@@ -294,12 +294,12 @@ to collaborate
     ;;set mentalNrg mentalNrg - mentalDrain
     set knowledge knowledge + 1
     set level floor(knowledge / 10)
-    set color red
+    ;; set color red
   ]  
   
   if(level > [level] of partner)
   [
-    set color green 
+    ;; set color green 
     if(level < bestLevel)
     [set knowledge knowledge + 1 set level floor(knowledge / 10)]
     
@@ -313,12 +313,14 @@ end
 
 to move
   if(partner = nobody)
-  [set color blue forward 1]
+  [forward 1]
+  ;;[set color blue forward 1]
   
   if(partner != nobody)
   [
     ifelse(distance partner > 2)
-    [set color blue face partner forward 1]
+    [face partner forward 1]
+    ;;[set color blue face partner forward 1]
     [set status ""]  
   ]
 end
