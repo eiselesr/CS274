@@ -672,9 +672,9 @@ PLOT
 307
 1323
 526
-Chance of Question
-NIL
-NIL
+Chance of Question VS Knowledge
+chanceOfQuestion
+knowledge
 0.0
 1.0
 0.0
