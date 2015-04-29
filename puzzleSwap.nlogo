@@ -10,32 +10,31 @@ extensions [array]
 breed [students student]
 students-own[  
   ;;--SOCIAL energy factors--
-  socialStamina
-  socialNrg
-  socialDrain
-  socialRecover
-  ;;socialTime ;; expected time to spend socializing
-  consultTime
-  collabTime
-  collabDev
-  consultDev
+  socialStamina ;; Maximum energy student has for social activities
+  socialNrg ;; Current energy for social activities
+  socialDrain ;; Social energy lost after performing a social activity for one time tick
+  socialRecover ;; Social energy gained while resting
+  consultTime ;; average time to spend with the professor
+  collabTime ;; average time to spend with a peer
+  collabDev ;; standard deviation for time spent with peers
+  consultDev ;; standard deviation for time spent with professor
   ;;--MENTAL energy factors--
-  mentalStamina
-  mentalNrg
-  mentalDrain
-  mentalRecover
-  readTime ;; expected time to spend reading
-  readDev
+  mentalStamina ;; Maximum energy student has for mental activities
+  mentalNrg ;; Current energy for mental activities
+  mentalDrain ;; Mental energy lost after performing a social activity for one time tick
+  mentalRecover ;; mental energy gained while resting
+  readTime ;; average time to spend reading
+  readDev ;; standard deviation for time spent reading
   ;;--Learning factors--
   ;;ZPD slider value
-  chanceOfLearning
-  chanceOfQuestion
-  knowledge
-  question
-  level
-  bestLevel
-  collabX
-  questionX
+  chanceOfLearning ;; probability of student increasing in knowledge
+  chanceOfQuestion ;; probability of student having a question
+  knowledge ;; The amount of knowledge obtained
+  question ;; question difficulty level
+  level ;; floor (knowledge / 10)
+  bestLevel ;; The highest value level has had
+  collabX ;; A multiplier that is used when reading with a partner to affect the chance of learning
+  questionX ;; A mulitiplier that is used when the student has a question to affect the chance of learning
   ;;--Preferences--
   class ;; group of lazy vs smart for example
   restPref
@@ -43,15 +42,18 @@ students-own[
   collabPref
   readPref
   ;;--Other--
-  partner
-  state
-  options
-  time
-  status ;; an extra varible to see if the agent is moving, waiting etc.
-  restTimer
+  partner ;; who, if anyone, is the students partner
+  state ;; The state of a student {read, collaborate, consult, rest}
+  options ;; Not acutally used, but these are the activities that a student could choose at the end of the choose-activity function
+  time ;; How long an activity will last if it is uninterupted. 
+  status ;; an extra varible to see if the agent is moving or waiting.
+  restTimer ;; tracks the consecutive number of ticks for which a student chooses rest
   ]
 breed [professors professor]
 
+;;-----------------------------------------------------------------------------------------------------------
+;;   SETUP 
+;;-----------------------------------------------------------------------------------------------------------
 to setup
   clear-all
   stop-inspecting-dead-agents
@@ -61,7 +63,10 @@ to setup
   reset-ticks
 end
 
-to setup-students [classVal Prefs NumStudents visual]
+;;-----------------------------------------------------------------------------------------------------------
+;;   SETUP FOR STUDENTS.
+;;-----------------------------------------------------------------------------------------------------------
+to setup-students [classVal Prefs NumStudents visual] ;;rest consult collab read
   set-default-shape students "person-read"
   create-students NumStudents
   [
@@ -118,59 +123,89 @@ to setup-students [classVal Prefs NumStudents visual]
   ;;ask students [ set mem-array array:from-list n-values 16 [0]]
 end
 
-
+;;-----------------------------------------------------------------------------------------------------------
+;;   SETUP FOR PROFESSOR
+;;-----------------------------------------------------------------------------------------------------------
 to setup-professor
   set-default-shape professors "person graduate"
   create-professors 1
 end
 
+;;-----------------------------------------------------------------------------------------------------------
+;;   GO - THESE RUN AT EVERY TICK. A TICK REPRESENTS 1 MINUTE
+;;-----------------------------------------------------------------------------------------------------------
 to go  
   ask students [set time time - 1]
   ask students [ if(level >= question)[set question 0]] ;; if my lvl is equal to or higher than the question, the question is resolved.
-  ask students [set bestLevel max list level bestLevel]
+  ask students [set bestLevel max list level bestLevel] ;; Update bestLevel
+  
+  ;;Mental drain goes down while reading. status can be "move" "wait" or "". This means that mental energy also goes down in collaborate and consult when the state
+  ;; is entered the first time, and when the student is close enough to the partner to work. Traveling doesn't consume energy 
   ask students [if((state = "collaborate" and status = "") or state = "read" or (state = "consult" and status = "")) [set mentalNrg mentalNrg - mentalDrain ]]
+  
+  ;; Social energy is consumed when a student has a partner, and the status is not "move" or "wait"
   ask students [if((partner != nobody) and status = "")[set socialNrg socialNrg - socialDrain]]
-  plot-LearnChanceVsKnowledge
-  ;;ask students [if(stat
-  do-activity
+  
+  do-activity ;; Calls do-activity
   tick
-  if(ticks > 1440)[stop]
+  if(ticks > 1440)[stop] ;; stops the simulation after 1440 "minutes"
 end
 
+;;-----------------------------------------------------------------------------------------------------------
+;;   CHOOSE THE NEXT ACTIVITY
+;;-----------------------------------------------------------------------------------------------------------
 to choose-activity  
   ;;user-message (word "choose-activity " who)
   set options []
   set time 0
   let nearest-neighbor min-one-of (other students with [ socialNrg > (collabTime * socialDrain)and (mentalNrg > (collabTime * mentalDrain)) and (state = "read" or state = "rest") and (partner = nobody)])[distance myself];; Find the closest student of the students with state
-  let a 0
-  let b 0
-  let c 0
+  
+  ;; these are used like switches. 0 means the activity cannot be selected. 1 means the probability of the activity is the preferance number divided the sum of all possible pref numbers
+  let a 0 ;; read
+  let b 0 ;; collab
+  let c 0 ;; consult
   ;;-------READ---------------------------
-  if(mentalNrg - (readTime * mentalDrain)) > 0
+  if(mentalNrg - (readTime * mentalDrain)) > 0 ;; in order to read you must have enough mental energy to last for an average reading session
   [set options lput "read" options 
    set a 1 ]
   
   ;;-------COLLABORATE--------------------
   if(nearest-neighbor != nobody)
   [    
-    if(socialNrg >= (collabTime * socialDrain + distance nearest-neighbor) and (mentalNrg > (collabTime * mentalDrain + distance nearest-neighbor))) ;; SHOULD WE CHECK METAL ENERGY AS WELL?
+    ;; in order to collaborate we must have enough energy to complete an average collaborate session
+    ;;if(socialNrg >= (collabTime * socialDrain + distance nearest-neighbor) and (mentalNrg > (collabTime * mentalDrain + distance nearest-neighbor)))
+    if(socialNrg >= (collabTime * socialDrain) and (mentalNrg > (collabTime * mentalDrain))) ;; dont need above equation if there is no energy lost while moving
     [set options lput "collaborate" options
      set b 1]
   ]  
   
   ;;-------CONSULT----------------
   let prf_distance distance one-of professors
-  ;;if ((mentalNrg - distance one-of professors) > 0 and (question > 0)) ;; SHOULD WE CHECK MENTAL AND SOCIAL ENERGY?
-  if((socialNrg >= (consultTime * socialDrain + prf_distance) and (mentalNrg > (consultTime * mentalDrain + prf_distance))) and question > 0)
+  
+  ;; Must have enough energy for an average consult session, and a question
+  ;;if((socialNrg >= (consultTime * socialDrain + prf_distance) and (mentalNrg > (consultTime * mentalDrain + prf_distance))) and question > 0)
+  if((socialNrg >= (consultTime * socialDrain) and (mentalNrg > (consultTime * mentalDrain))) and question > 0)
   [ set options lput "consult" options
     set c 1]
   
   ;;-------REST-------------
   set options lput "rest" options
   
-  ;;-----------------------------
-  ;;         CHOOSE
-  ;;-----------------------------
+  ;;-------------------------------------------------------
+  ;;            CHOOSE
+  ;; example: total = 2 2 0 2 = 6
+  ;; readLim = 2 collabLim = 4 consultLim = 4
+  ;; 0< choice <= 2 -> state = "read"
+  ;; 2< choice <= 4 -> state = "collaborate"
+  ;; 4< choice <= 4 -> not possible so -> state = "rest"
+  ;; if choice = 1 -> state = "read"
+  ;; if choice = 2 -> state = "read"
+  ;; if choice = 3 -> state = "collaborate"
+  ;; if choice = 4 -> state = "collaborate"
+  ;; if choice = 5 -> state = "rest"
+  ;; if choice = 6 -> state = "rest"
+  ;; P(rest) = P(collaborate) = P(rest) 33%
+  ;;-------------------------------------------------------
   let total (a * readPref) + (b * collabPref) + (c * consultPref) + restPref
   let readLim  (a * readPref)
   let collabLim (b * collabPref) + readLim
@@ -183,13 +218,18 @@ to choose-activity
   [set state "rest" ;; default case
   ]]]  
   
-  if(state != "rest")
+  ;;--------------------------------------------------------------
+ 
+  if(state != "rest") ;; increment the rest timer for each consecutive selection of the rest activity
   [set restTimer 0]
   ;;user-message (word "end choose-activity: " who " is " state)
   
 ;  set level floor (knowledge / 10)
 end
 
+;;-----------------------------------------------------------------------------------------------------------
+;;   DO THE ACTIVITY
+;;-----------------------------------------------------------------------------------------------------------
 to do-activity  
   foreach sort students
   [
@@ -204,14 +244,15 @@ to do-activity
       ;;-------REST-------------
       if (state = "rest") [rest]
     ]
-  ]
-  
+  ]  
 end
 
-
+;;-----------------------------------------------------------------------------------------------------------
+;;   READ
+;;-----------------------------------------------------------------------------------------------------------
 to read  
-  ;;user-message (word " to read: " who " " time )
-  ;;set mentalNrg mentalNrg - mentalDrain
+  
+  ;; If this becomes true, clean up and choose a new activity
   if (time <= 0 or (mentalNrg <= 0)) 
   [
     choose-activity 
@@ -225,13 +266,15 @@ to read
       
   let multiplier 1
   ;; set color red
-  if (question > level)[set multiplier questionX]
-  if (partner != nobody)[set multiplier collabX]
+  if (question > level)[set multiplier questionX] ;; affect chance of learning when student has a question
+  if (partner != nobody)[set multiplier collabX] ;; affect chance of learning when student has a partner
   
+  ;; See if the student learns something
   if ((1 - chanceOfLearning * multiplier) <= (random-float 1))[ 
     set knowledge knowledge + 1 
     set level floor(knowledge / 10)]
   
+  ;; See if the student has a question
   if((1 - chanceOfQuestion) < (random-float 1) and question = 0 and partner = nobody) ;; try to generate a question if I have no partner and no question
   [
     set question ceiling(random-normal level ZPD) ;; determine question difficulty
@@ -242,9 +285,12 @@ to read
   
 end
 
+;;-----------------------------------------------------------------------------------------------------------
+;;  REST
+;;-----------------------------------------------------------------------------------------------------------
 to rest 
   ;; set color grey
-  ifelse((mentalNrg < mentalStamina) and (mentalNrg + mentalRecover)< mentalStamina)
+  ifelse((mentalNrg < mentalStamina) and (mentalNrg + mentalRecover)< mentalStamina) ;; increase energy. If increase would go beyond max, set to max. 
   [ set mentalnrg mentalnrg + mentalRecover]
   [ set mentalnrg mentalStamina]
   
@@ -257,6 +303,10 @@ to rest
     [set knowledge knowledge - 1]
   choose-activity
 end
+
+;;-----------------------------------------------------------------------------------------------------------
+;;   COLLABORATE
+;;-----------------------------------------------------------------------------------------------------------
 
 to collaborate
   ;;if(status = "")[set socialNrg socialNrg - socialDrain] ;; only drain social energy when together, and when setting up connection
@@ -272,8 +322,11 @@ to collaborate
   
   if partner = nobody
   [
+    ;; For a partner, choose the closest student that has enough energy to collaborate and is in the read, or rest state.
     set partner min-one-of (other students with [ (socialNrg > (collabTime * socialDrain)) and (mentalNrg > (collabTime * mentalDrain)) and (state = "read" or state = "rest")])[distance myself];; Find the closest student of the students with state
-    ifelse(partner != nobody) ;; Just in case. I don't think this would happen... but I don't know
+    
+    ;; if there is a student that meets the requirements have them set me as a partner, otherwise choose a new activity
+    ifelse(partner != nobody) ;; 
     [ set status "move" 
       set time ceiling(time + distance partner)
       
@@ -289,7 +342,7 @@ to collaborate
   if(status = "wait" and (distance partner < 2))
   [set status ""]
   
-  if(level < [level] of partner)
+  if(level < [level] of partner) ;; if my level is lower, increase knowledge. 
   [
     ;;set mentalNrg mentalNrg - mentalDrain
     set knowledge knowledge + 1
@@ -297,7 +350,7 @@ to collaborate
     ;; set color red
   ]  
   
-  if(level > [level] of partner)
+  if(level > [level] of partner);; if my level is higher, but lower than the highest I've head increase knowledge
   [
     ;; set color green 
     if(level < bestLevel)
@@ -306,11 +359,15 @@ to collaborate
     ;;set mentalNrg mentalNrg - mentalDrain
   ]
   
-  if(level = [level] of partner and status = "")
+  if(level = [level] of partner and status = "") ;; if we are the same, switch to partner reading
   [set state "read"]
   
 end
 
+
+;;-----------------------------------------------------------------------------------------------------------
+;;   MOVE
+;;-----------------------------------------------------------------------------------------------------------
 to move
   if(partner = nobody)
   [forward 1]
@@ -321,13 +378,16 @@ to move
     ifelse(distance partner > 2)
     [face partner forward 1]
     ;;[set color blue face partner forward 1]
-    [set status ""]  
+    [set status ""]  ;; signals when the partners are close enough. 
   ]
 end
 
-
+;;-----------------------------------------------------------------------------------------------------------
+;;   CONSULT
+;;-----------------------------------------------------------------------------------------------------------
 to consult
   
+  ;; If this becomes true, clean up and choose a new activity
   if(time <= 0 or (socialNrg <= 0) or (mentalNrg <= 0))
   [choose-activity
     if (partner != nobody) ;; need to check because it possible to enter this block before a partner is set
@@ -335,37 +395,46 @@ to consult
     stop
   ]
   
+  ;; This occurst the first time the function is run after choosing the activity
   if(partner = nobody and question != 0)
   [ set partner one-of professors
     set status "move"
     set time ceiling(time + distance partner)]
   
+  ;; This occurs to get the student close to the teacher
   if(status = "move" and time > 0)
   [move stop]
   
+  ;; If the student has a question then...
   if(question != 0)
   [
-    set level min (list question (level + ZPD) )
-    if(level >= question)[set question 0]
-    set knowledge level * 10
-    set partner nobody
-    set time random 10 + 5;; time to move away from prof
+    set level min (list question (level + ZPD) );; set the students level to the question level or the level + zpd whichever is smaller.
+    if(level >= question)[set question 0] ;; Check to see if question was answered.
+    set knowledge level * 10 ;; update knowldge to match
+    set partner nobody ;;clean up
+    set time random 10 + 5;; time to move away from prof, or if there is still a question how long the next session will last
     set heading random 360
     set status "move"
   ]
   
-  if(question = 0 and time <= 0)
+  if(question = 0 and time <= 0) ;; This is so the student can move away after getting having their question answered. I think. I don't remember right now. You might be able to delete this.
   [choose-activity] 
   
 end
 
 
+;;-----------------------------------
+;;   BETA VALUE GENERATOR FUNCTION
+;;-----------------------------------
 to-report random-beta [alpha]
   let x random-gamma alpha 1
   
   report ( x / ( x + random-gamma alpha 1) )   
 end
 
+;;-------------------------------------------------------------
+;;   FUNCTIONS CALLED PLOTS in GUI
+;;-------------------------------------------------------------
 to plot-LearnChanceVsKnowledge
   clear-plot
   ask students [set-current-plot-pen class plotxy chanceofLearning knowledge]
@@ -465,7 +534,7 @@ ZPD
 ZPD
 0
 5
-5
+1
 1
 1
 NIL
