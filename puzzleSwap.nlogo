@@ -54,7 +54,7 @@ breed [professors professor]
 
 to setup
   set timesRested  0
-  set timesConsulted 0
+  set timesConsult 0
   set timesCollab 0
   set timesRead 0
   clear-all
@@ -250,7 +250,7 @@ to read
 end
 
 to rest 
-  set timesRested times + 1
+  set timesRested timesRested + 1
   ;; set color grey
   ifelse((mentalNrg < mentalStamina) and (mentalNrg + mentalRecover)< mentalStamina)
   [ set mentalnrg mentalnrg + mentalRecover]
@@ -268,7 +268,7 @@ end
 
 to collaborate
   ;;if(status = "")[set socialNrg socialNrg - socialDrain] ;; only drain social energy when together, and when setting up connection
-  set timesConsult timesConsult + 1
+  set timesCollab timesCollab + 1
   
   if(time <= 0 or (socialNrg <= 0) or (mentalNrg <= 0))
   [choose-activity
@@ -583,7 +583,7 @@ SWITCH
 43
 consumeEnergy
 consumeEnergy
-0
+1
 1
 -1000
 
@@ -649,7 +649,7 @@ numTotal
 numTotal
 1
 100
-50
+1
 1
 1
 NIL
@@ -873,6 +873,24 @@ PENS
 "consult" 1.0 0 -8630108 true "" "plot count students with [class = \"B\" and state = \"consult\"]"
 "collab" 1.0 0 -817084 true "" "plot count students with [class = \"B\" and is-student? partner]"
 "rest" 1.0 0 -8732573 true "" "plot count students with [class = \"B\" and state = \"rest\"]"
+
+PLOT
+517
+201
+717
+351
+n times rest consult collab read
+rest consult collab read
+times
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 1 -16777216 true "" "plotxy 1 timesRested \nplotxy 3 timesConsult \nplotxy 5 timesCollab \nplotxy 7 timesRead"
 
 @#$#@#$#@
 ## WHAT IS IT?
