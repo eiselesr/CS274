@@ -736,7 +736,7 @@ A1
 A1
 1
 12
-1
+3
 1
 1
 NIL
@@ -751,7 +751,7 @@ A2
 A2
 1
 12
-1
+3
 1
 1
 NIL
@@ -766,7 +766,7 @@ A3
 A3
 1
 12
-12
+3
 1
 1
 NIL
@@ -781,7 +781,7 @@ A4
 A4
 1
 12
-1
+3
 1
 1
 NIL
@@ -1614,6 +1614,56 @@ setup</setup>
     </enumeratedValueSet>
     <enumeratedValueSet variable="A4">
       <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="B1">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="B2">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="B3">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="B4">
+      <value value="3"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="2C indivDiff 20A3333" repetitions="20" runMetricsEveryStep="false">
+    <setup>random-seed 10 + behaviorspace-run-number
+setup</setup>
+    <go>go</go>
+    <final>export-plot "LearnChanceVsKnowledge" (word behaviorspace-experiment-name "learnchance plot" behaviorspace-run-number ".csv")
+export-plot "Chance of Question" (word behaviorspace-experiment-name "qn chance" behaviorspace-run-number ".csv")</final>
+    <timeLimit steps="1441"/>
+    <metric>mean [knowledge] of students</metric>
+    <metric>standard-deviation [knowledge] of students</metric>
+    <metric>mean [chanceOfLearning] of students</metric>
+    <metric>standard-deviation [chanceOfLearning] of students</metric>
+    <metric>mean [chanceOfQuestion] of students</metric>
+    <metric>standard-deviation [chanceOfQuestion] of students</metric>
+    <enumeratedValueSet variable="consumeEnergy">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ZPD">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numA">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numTotal">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A1">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A2">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A3">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A4">
+      <value value="3"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="B1">
       <value value="3"/>
