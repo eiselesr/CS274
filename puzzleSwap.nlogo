@@ -5,7 +5,7 @@
 ;; try for more realistic behavior
 ;; code commentary
 ;; Friend network?
-
+globals [timesRested timesConsult timesCollab timesRead]
 extensions [array]
 breed [students student]
 students-own[  
@@ -53,6 +53,10 @@ students-own[
 breed [professors professor]
 
 to setup
+  set timesRested  0
+  set timesConsulted 0
+  set timesCollab 0
+  set timesRead 0
   clear-all
   stop-inspecting-dead-agents
   setup-professor 
@@ -212,6 +216,7 @@ end
 
 
 to read  
+  set timesRead timesRead + 1
   ;;user-message (word " to read: " who " " time )
   ;;set mentalNrg mentalNrg - mentalDrain
   if (time <= 0 or (mentalNrg <= 0)) 
@@ -245,6 +250,7 @@ to read
 end
 
 to rest 
+  set timesRested times + 1
   ;; set color grey
   ifelse((mentalNrg < mentalStamina) and (mentalNrg + mentalRecover)< mentalStamina)
   [ set mentalnrg mentalnrg + mentalRecover]
@@ -262,7 +268,7 @@ end
 
 to collaborate
   ;;if(status = "")[set socialNrg socialNrg - socialDrain] ;; only drain social energy when together, and when setting up connection
-  
+  set timesConsult timesConsult + 1
   
   if(time <= 0 or (socialNrg <= 0) or (mentalNrg <= 0))
   [choose-activity
@@ -329,7 +335,7 @@ end
 
 
 to consult
-  
+  set timesConsult timesConsult + 1
   if(time <= 0 or (socialNrg <= 0) or (mentalNrg <= 0))
   [choose-activity
     if (partner != nobody) ;; need to check because it possible to enter this block before a partner is set
