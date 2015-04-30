@@ -1,10 +1,10 @@
 ;; end simulation at 1440 - done
 ;; scatter plot knowledge of studnets againts chance of learning - done
-;; code commentary
-;; Friend network?
 ;; color students based on type - done
 ;; look over slides and paper
 ;; try for more realistic behavior
+;; code commentary
+;; Friend network?
 
 extensions [array]
 breed [students student]
@@ -606,8 +606,8 @@ PLOT
 1323
 526
 Chance of Question
-NIL
-NIL
+chanceOfQuestion
+knowledge
 0.0
 1.0
 0.0
@@ -628,7 +628,7 @@ numA
 numA
 0
 50
-34
+33
 1
 1
 NIL
@@ -650,10 +650,10 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-38
-70
-245
-98
+47
+67
+254
+85
 SET: number of red and blue students
 11
 0.0
