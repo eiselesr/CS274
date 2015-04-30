@@ -118,7 +118,7 @@ to setup-students [classVal Prefs NumStudents visual]
     set time 0
     set status ""    
   ]
-  ask students [choose-activity]
+  ;;ask students [choose-activity]
   ;;ask students [inspect self] ;;inspect student # for all students
   ;;ask students [ set lambda .01]
   ;;ask students [ set mem-array array:from-list n-values 16 [0]]
@@ -550,9 +550,9 @@ true
 true
 "" "clear-plot"
 PENS
-"read" 1.0 1 -16777216 true "" "plotxy 1 count students with [state = \"read\"]"
+"read" 1.0 1 -16777216 true "" "plotxy 1 count students with [state = \"read\" and partner = \"nobody\"]"
 "consult" 1.0 1 -7500403 true "" "plotxy 3 count students with [state = \"consult\"]"
-"collab" 1.0 1 -2674135 true "" "plotxy 5 count students with [state = \"collaborate\" ]"
+"collab" 1.0 1 -2674135 true "" "plotxy 5 count students with [is-student? partner]"
 "rest" 1.0 1 -14454117 true "" "plotxy 7 count students with [state = \"rest\"]"
 
 PLOT
@@ -583,7 +583,7 @@ SWITCH
 43
 consumeEnergy
 consumeEnergy
-1
+0
 1
 -1000
 
@@ -649,7 +649,7 @@ numTotal
 numTotal
 1
 100
-1
+36
 1
 1
 NIL
