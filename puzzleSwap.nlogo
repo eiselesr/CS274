@@ -5,6 +5,8 @@
 ;; try for more realistic behavior
 ;; code commentary
 ;; Friend network?
+
+;; ask best students what they did.
 globals [timesRested timesConsult timesCollab timesRead]
 extensions [array]
 breed [students student]
@@ -49,6 +51,11 @@ students-own[
   time
   status ;; an extra varible to see if the agent is moving, waiting etc.
   restTimer
+  ;;Activity Timers
+  time-in-rest
+  time-in-consult
+  time-in-collab
+  time-in-read
   ]
 breed [professors professor]
 
@@ -111,6 +118,12 @@ to setup-students [classVal Prefs NumStudents visual]
     set readPref item 3 Prefs
     set class classVal
     set color visual
+    
+    ;;Activity Timers
+    set time-in-rest 0
+    set time-in-consult 0
+    set time-in-collab 0
+    set time-in-read 0
     
     set partner nobody
     set state "rest" 
@@ -217,9 +230,9 @@ end
 
 to read  
   ifelse (partner = nobody) 
-  [set timesRead timesRead + 1
+  [set timesRead timesRead + 1 set time-in-read time-in-read + 1
   ]
-  [set timesCollab timesCollab + 1
+  [set timesCollab timesCollab + 1 set time-in-collab time-in-collab + 1
   ]
   ;;user-message (word " to read: " who " " time )
   ;;set mentalNrg mentalNrg - mentalDrain
@@ -255,6 +268,7 @@ end
 
 to rest 
   set timesRested timesRested + 1
+  set time-in-rest time-in-rest + 1
   ;; set color grey
   ifelse((mentalNrg < mentalStamina) and (mentalNrg + mentalRecover)< mentalStamina)
   [ set mentalnrg mentalnrg + mentalRecover]
@@ -273,6 +287,7 @@ end
 to collaborate
   ;;if(status = "")[set socialNrg socialNrg - socialDrain] ;; only drain social energy when together, and when setting up connection
   set timesCollab timesCollab + 1
+  set time-in-collab time-in-collab + 1
   
   if(time <= 0 or (socialNrg <= 0) or (mentalNrg <= 0))
   [choose-activity
@@ -340,6 +355,7 @@ end
 
 to consult
   set timesConsult timesConsult + 1
+  set time-in-consult time-in-consult + 1
   if(time <= 0 or (socialNrg <= 0) or (mentalNrg <= 0))
   [choose-activity
     if (partner != nobody) ;; need to check because it possible to enter this block before a partner is set
