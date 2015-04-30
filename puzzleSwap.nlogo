@@ -603,7 +603,7 @@ SWITCH
 43
 consumeEnergy
 consumeEnergy
-0
+1
 1
 -1000
 
@@ -752,7 +752,7 @@ A1
 A1
 1
 12
-3
+0
 1
 1
 NIL
@@ -765,9 +765,9 @@ SLIDER
 204
 A2
 A2
-1
+0
 12
-3
+4
 1
 1
 NIL
@@ -782,7 +782,7 @@ A3
 A3
 1
 12
-3
+4
 1
 1
 NIL
@@ -797,7 +797,7 @@ A4
 A4
 1
 12
-3
+4
 1
 1
 NIL
@@ -1692,6 +1692,390 @@ export-plot "Chance of Question" (word behaviorspace-experiment-name "qn chance"
     </enumeratedValueSet>
     <enumeratedValueSet variable="B4">
       <value value="3"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="20A6222 timeinActivity rep20" repetitions="20" runMetricsEveryStep="false">
+    <setup>random-seed 1000 + behaviorspace-run-number
+setup</setup>
+    <go>go</go>
+    <timeLimit steps="1441"/>
+    <metric>mean [knowledge] of students</metric>
+    <metric>standard-deviation [knowledge] of students</metric>
+    <metric>mean [time-in-rest] of students</metric>
+    <metric>mean [time-in-consult] of students</metric>
+    <metric>mean [time-in-collab] of students</metric>
+    <metric>mean [time-in-read] of students</metric>
+    <metric>[time-in-rest] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-consult] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-collab] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-read] of max-one-of students [knowledge]</metric>
+    <metric>[chanceOfLearning] of max-one-of students [knowledge]</metric>
+    <metric>[chanceOfQuestion] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-rest] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-consult] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-collab] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-read] of min-one-of students [knowledge]</metric>
+    <metric>[chanceOfLearning] of min-one-of students [knowledge]</metric>
+    <metric>[chanceOfQuestion] of min-one-of students [knowledge]</metric>
+    <enumeratedValueSet variable="consumeEnergy">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ZPD">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numA">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numTotal">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A1">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A2">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A3">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A4">
+      <value value="2"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="20A6141 timeinActivity rep20" repetitions="20" runMetricsEveryStep="false">
+    <setup>random-seed 6141 + behaviorspace-run-number
+setup</setup>
+    <go>go</go>
+    <timeLimit steps="1441"/>
+    <metric>mean [knowledge] of students</metric>
+    <metric>standard-deviation [knowledge] of students</metric>
+    <metric>mean [time-in-rest] of students</metric>
+    <metric>mean [time-in-consult] of students</metric>
+    <metric>mean [time-in-collab] of students</metric>
+    <metric>mean [time-in-read] of students</metric>
+    <metric>[time-in-rest] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-consult] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-collab] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-read] of max-one-of students [knowledge]</metric>
+    <metric>[chanceOfLearning] of max-one-of students [knowledge]</metric>
+    <metric>[chanceOfQuestion] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-rest] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-consult] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-collab] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-read] of min-one-of students [knowledge]</metric>
+    <metric>[chanceOfLearning] of min-one-of students [knowledge]</metric>
+    <metric>[chanceOfQuestion] of min-one-of students [knowledge]</metric>
+    <enumeratedValueSet variable="consumeEnergy">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ZPD">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numA">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numTotal">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A1">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A2">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A3">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A4">
+      <value value="1"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="20A6114 timeinActivity rep20" repetitions="20" runMetricsEveryStep="false">
+    <setup>random-seed 6114 + behaviorspace-run-number
+setup</setup>
+    <go>go</go>
+    <timeLimit steps="1441"/>
+    <metric>mean [knowledge] of students</metric>
+    <metric>standard-deviation [knowledge] of students</metric>
+    <metric>mean [time-in-rest] of students</metric>
+    <metric>mean [time-in-consult] of students</metric>
+    <metric>mean [time-in-collab] of students</metric>
+    <metric>mean [time-in-read] of students</metric>
+    <metric>[time-in-rest] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-consult] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-collab] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-read] of max-one-of students [knowledge]</metric>
+    <metric>[chanceOfLearning] of max-one-of students [knowledge]</metric>
+    <metric>[chanceOfQuestion] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-rest] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-consult] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-collab] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-read] of min-one-of students [knowledge]</metric>
+    <metric>[chanceOfLearning] of min-one-of students [knowledge]</metric>
+    <metric>[chanceOfQuestion] of min-one-of students [knowledge]</metric>
+    <enumeratedValueSet variable="consumeEnergy">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ZPD">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numA">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numTotal">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A1">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A2">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A3">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A4">
+      <value value="4"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="20A3333 timeinActivity rep20" repetitions="20" runMetricsEveryStep="false">
+    <setup>random-seed 3333 + behaviorspace-run-number
+setup</setup>
+    <go>go</go>
+    <timeLimit steps="1441"/>
+    <metric>mean [knowledge] of students</metric>
+    <metric>standard-deviation [knowledge] of students</metric>
+    <metric>mean [time-in-rest] of students</metric>
+    <metric>mean [time-in-consult] of students</metric>
+    <metric>mean [time-in-collab] of students</metric>
+    <metric>mean [time-in-read] of students</metric>
+    <metric>[time-in-rest] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-consult] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-collab] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-read] of max-one-of students [knowledge]</metric>
+    <metric>[chanceOfLearning] of max-one-of students [knowledge]</metric>
+    <metric>[chanceOfQuestion] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-rest] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-consult] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-collab] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-read] of min-one-of students [knowledge]</metric>
+    <metric>[chanceOfLearning] of min-one-of students [knowledge]</metric>
+    <metric>[chanceOfQuestion] of min-one-of students [knowledge]</metric>
+    <enumeratedValueSet variable="consumeEnergy">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ZPD">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numA">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numTotal">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A1">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A2">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A3">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A4">
+      <value value="3"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="20A3252 timeinActivity rep20" repetitions="20" runMetricsEveryStep="false">
+    <setup>random-seed 3252 + behaviorspace-run-number
+setup</setup>
+    <go>go</go>
+    <timeLimit steps="1441"/>
+    <metric>mean [knowledge] of students</metric>
+    <metric>standard-deviation [knowledge] of students</metric>
+    <metric>mean [time-in-rest] of students</metric>
+    <metric>mean [time-in-consult] of students</metric>
+    <metric>mean [time-in-collab] of students</metric>
+    <metric>mean [time-in-read] of students</metric>
+    <metric>[time-in-rest] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-consult] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-collab] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-read] of max-one-of students [knowledge]</metric>
+    <metric>[chanceOfLearning] of max-one-of students [knowledge]</metric>
+    <metric>[chanceOfQuestion] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-rest] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-consult] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-collab] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-read] of min-one-of students [knowledge]</metric>
+    <metric>[chanceOfLearning] of min-one-of students [knowledge]</metric>
+    <metric>[chanceOfQuestion] of min-one-of students [knowledge]</metric>
+    <enumeratedValueSet variable="consumeEnergy">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ZPD">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numA">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numTotal">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A1">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A2">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A3">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A4">
+      <value value="2"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="20A3225 timeinActivity rep20" repetitions="20" runMetricsEveryStep="false">
+    <setup>random-seed 3225 + behaviorspace-run-number
+setup</setup>
+    <go>go</go>
+    <timeLimit steps="1441"/>
+    <metric>mean [knowledge] of students</metric>
+    <metric>standard-deviation [knowledge] of students</metric>
+    <metric>mean [time-in-rest] of students</metric>
+    <metric>mean [time-in-consult] of students</metric>
+    <metric>mean [time-in-collab] of students</metric>
+    <metric>mean [time-in-read] of students</metric>
+    <metric>[time-in-rest] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-consult] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-collab] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-read] of max-one-of students [knowledge]</metric>
+    <metric>[chanceOfLearning] of max-one-of students [knowledge]</metric>
+    <metric>[chanceOfQuestion] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-rest] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-consult] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-collab] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-read] of min-one-of students [knowledge]</metric>
+    <metric>[chanceOfLearning] of min-one-of students [knowledge]</metric>
+    <metric>[chanceOfQuestion] of min-one-of students [knowledge]</metric>
+    <enumeratedValueSet variable="consumeEnergy">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ZPD">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numA">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numTotal">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A1">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A2">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A3">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A4">
+      <value value="5"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="20A4044 timeinActivity rep20" repetitions="20" runMetricsEveryStep="false">
+    <setup>random-seed 4044 + behaviorspace-run-number
+setup</setup>
+    <go>go</go>
+    <timeLimit steps="1441"/>
+    <metric>mean [knowledge] of students</metric>
+    <metric>standard-deviation [knowledge] of students</metric>
+    <metric>mean [time-in-rest] of students</metric>
+    <metric>mean [time-in-consult] of students</metric>
+    <metric>mean [time-in-collab] of students</metric>
+    <metric>mean [time-in-read] of students</metric>
+    <metric>[time-in-rest] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-consult] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-collab] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-read] of max-one-of students [knowledge]</metric>
+    <metric>[chanceOfLearning] of max-one-of students [knowledge]</metric>
+    <metric>[chanceOfQuestion] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-rest] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-consult] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-collab] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-read] of min-one-of students [knowledge]</metric>
+    <metric>[chanceOfLearning] of min-one-of students [knowledge]</metric>
+    <metric>[chanceOfQuestion] of min-one-of students [knowledge]</metric>
+    <enumeratedValueSet variable="consumeEnergy">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ZPD">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numA">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numTotal">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A1">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A2">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A3">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A4">
+      <value value="4"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="noEatEnergy 20A0444 timeinActivity rep20" repetitions="20" runMetricsEveryStep="false">
+    <setup>random-seed 444 + behaviorspace-run-number
+setup</setup>
+    <go>go</go>
+    <timeLimit steps="1441"/>
+    <metric>mean [knowledge] of students</metric>
+    <metric>standard-deviation [knowledge] of students</metric>
+    <metric>mean [time-in-rest] of students</metric>
+    <metric>mean [time-in-consult] of students</metric>
+    <metric>mean [time-in-collab] of students</metric>
+    <metric>mean [time-in-read] of students</metric>
+    <metric>[time-in-rest] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-consult] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-collab] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-read] of max-one-of students [knowledge]</metric>
+    <metric>[chanceOfLearning] of max-one-of students [knowledge]</metric>
+    <metric>[chanceOfQuestion] of max-one-of students [knowledge]</metric>
+    <metric>[time-in-rest] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-consult] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-collab] of min-one-of students [knowledge]</metric>
+    <metric>[time-in-read] of min-one-of students [knowledge]</metric>
+    <metric>[chanceOfLearning] of min-one-of students [knowledge]</metric>
+    <metric>[chanceOfQuestion] of min-one-of students [knowledge]</metric>
+    <enumeratedValueSet variable="consumeEnergy">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ZPD">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numA">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numTotal">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A1">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A2">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A3">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A4">
+      <value value="4"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
