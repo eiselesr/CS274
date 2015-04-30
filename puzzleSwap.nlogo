@@ -140,7 +140,7 @@ to go
   ;;ask students [if(stat
   do-activity
   tick
-  ;; if(ticks > 1440)[stop]
+  if(ticks > 1440)[stop]
 end
 
 to choose-activity  
@@ -216,7 +216,11 @@ end
 
 
 to read  
-  set timesRead timesRead + 1
+  ifelse (partner = nobody) 
+  [set timesRead timesRead + 1
+  ]
+  [set timesCollab timesCollab + 1
+  ]
   ;;user-message (word " to read: " who " " time )
   ;;set mentalNrg mentalNrg - mentalDrain
   if (time <= 0 or (mentalNrg <= 0)) 
@@ -550,10 +554,10 @@ true
 true
 "" "clear-plot"
 PENS
-"read" 1.0 1 -16777216 true "" "plotxy 1 count students with [state = \"read\" and partner = \"nobody\"]"
+"rest" 1.0 1 -16777216 true "" "plotxy 1 count students with [state = \"rest\"]"
 "consult" 1.0 1 -7500403 true "" "plotxy 3 count students with [state = \"consult\"]"
 "collab" 1.0 1 -2674135 true "" "plotxy 5 count students with [is-student? partner]"
-"rest" 1.0 1 -14454117 true "" "plotxy 7 count students with [state = \"rest\"]"
+"read" 1.0 1 -14454117 true "" "plotxy 7 count students with [state = \"read\" and partner = \"nobody\"]"
 
 PLOT
 624
@@ -634,7 +638,7 @@ numA
 numA
 0
 50
-33
+20
 1
 1
 NIL
@@ -649,17 +653,17 @@ numTotal
 numTotal
 1
 100
-36
+20
 1
 1
 NIL
 HORIZONTAL
 
 TEXTBOX
-47
-67
-254
-85
+30
+61
+237
+79
 SET: number of red and blue students
 11
 0.0
@@ -704,10 +708,10 @@ How does activity choice change over time?
 1
 
 TEXTBOX
-96
-672
-501
-697
+1034
+561
+1439
+586
 How does final knowledge depend on preferences?
 16
 33.0
@@ -732,7 +736,7 @@ A1
 A1
 1
 12
-6
+1
 1
 1
 NIL
@@ -747,7 +751,7 @@ A2
 A2
 1
 12
-2
+1
 1
 1
 NIL
@@ -762,7 +766,7 @@ A3
 A3
 1
 12
-2
+12
 1
 1
 NIL
@@ -777,7 +781,7 @@ A4
 A4
 1
 12
-2
+1
 1
 1
 NIL
@@ -875,10 +879,10 @@ PENS
 "rest" 1.0 0 -8732573 true "" "plot count students with [class = \"B\" and state = \"rest\"]"
 
 PLOT
-517
-201
-717
-351
+364
+556
+613
+706
 n times rest consult collab read
 rest consult collab read
 times
@@ -890,7 +894,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 1 -16777216 true "" "plotxy 1 timesRested \nplotxy 3 timesConsult \nplotxy 5 timesCollab \nplotxy 7 timesRead"
+"default" 1.0 1 -16777216 true "" "plotxy 1 timesRested\nplotxy 3 timesConsult \nplotxy 5 timesCollab \nplotxy 7 timesRead"
 
 @#$#@#$#@
 ## WHAT IS IT?
