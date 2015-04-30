@@ -1,0 +1,8 @@
+"BehaviorSpace results (NetLogo 5.2.0)"
+"puzzleSwap.nlogo"
+"chanceOfLearning 10A6222 10B3333 single"
+"04/29/2015 18:05:56:523 -0500"
+"min-pxcor","max-pxcor","min-pycor","max-pycor"
+"-16","16","-16","16"
+"[run number]","consumeEnergy","ZPD","numA","numTotal","A1","A2","A3","A4","B1","B2","B3","B4","[step]","mean [knowledge] of students","standard-deviation [knowledge] of students","mean [knowledge] of students with [class = ""A""]","standard-deviation [knowledge] of students with [class = ""A""]","mean [knowledge] of students with [class = ""B""]","standard-deviation [knowledge] of students with [class = ""B""]"
+"1","true","2","50","100","6","2","2","2","3","3","3","3","1441","255.56","164.15718754359256","191.38","113.51811686749765","319.74","182.07823055164044"
