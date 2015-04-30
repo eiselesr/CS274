@@ -58,8 +58,10 @@ to setup
   clear-all
   stop-inspecting-dead-agents
   setup-professor 
-  setup-students "A" preflist-A numA red
-  setup-students "B" preflist-B numB blue
+;;  setup-students "A" preflist-A numA red
+  setup-students "A" (list A1 A2 A3 A4) numA red
+  ;; setup-students "B" (list B1 B2 B3 B4) numB blue
+  setup-students "B" (list B1 B2 B3 B4) (numTotal - numA) blue
   reset-ticks
 end
 
@@ -148,7 +150,11 @@ to go
   
   do-activity ;; Calls do-activity
   tick
+<<<<<<< HEAD
   if(ticks > 1440)[stop] ;; stops the simulation after 1440 "minutes"
+=======
+  ;; if(ticks > 1440)[stop]
+>>>>>>> behav-space
 end
 
 ;;-----------------------------------------------------------------------------------------------------------
@@ -447,10 +453,10 @@ to plot-QuestionChanceVsKnowledge
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-21
-203
-354
-557
+20
+293
+353
+647
 16
 16
 9.8
@@ -535,7 +541,11 @@ ZPD
 ZPD
 0
 5
+<<<<<<< HEAD
 1
+=======
+2
+>>>>>>> behav-space
 1
 1
 NIL
@@ -619,8 +629,8 @@ PENS
 PLOT
 624
 308
-1009
-551
+1010
+525
 # of "A" students in each activity
 time
 count
@@ -686,26 +696,6 @@ PENS
 "A" 1.0 2 -2674135 true "" ""
 "B" 1.0 2 -13791810 true "" ""
 
-CHOOSER
-20
-144
-141
-189
-preflist-A
-preflist-A
-[6 2 2 2] [6 1 4 1] [6 1 1 4] [3 3 3 3] [3 2 5 2] [3 2 2 5]
-0
-
-CHOOSER
-150
-144
-271
-189
-preflist-B
-preflist-B
-[6 2 2 2] [6 1 4 1] [6 1 1 4] [3 3 3 3] [3 2 5 2] [3 2 2 5]
-0
-
 SLIDER
 20
 86
@@ -715,7 +705,7 @@ numA
 numA
 0
 50
-20
+34
 1
 1
 NIL
@@ -726,25 +716,15 @@ SLIDER
 86
 270
 119
-numB
-numB
-0
+numTotal
+numTotal
+1
+100
 50
-0
 1
 1
 NIL
 HORIZONTAL
-
-TEXTBOX
-38
-127
-250
-155
-SET: [Rest, Consult, Collaborate, Read]
-11
-0.0
-1
 
 TEXTBOX
 38
@@ -795,10 +775,10 @@ How does activity choice change over time?
 1
 
 TEXTBOX
-625
-559
-1030
-584
+96
+672
+501
+697
 How does final knowledge depend on preferences?
 16
 33.0
@@ -813,6 +793,157 @@ Live Monitors
 16
 32.0
 1
+
+SLIDER
+87
+129
+179
+162
+A1
+A1
+1
+12
+6
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+87
+171
+179
+204
+A2
+A2
+1
+12
+2
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+86
+213
+178
+246
+A3
+A3
+1
+12
+2
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+86
+254
+178
+287
+A4
+A4
+1
+12
+2
+1
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+20
+131
+98
+271
+1. Rest\n\n\n2. Consult\n\n\n3. Collab\n\n\n4. Read
+11
+0.0
+1
+
+SLIDER
+184
+130
+276
+163
+B1
+B1
+1
+12
+3
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+184
+171
+276
+204
+B2
+B2
+1
+12
+3
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+185
+213
+277
+246
+B3
+B3
+1
+12
+3
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+185
+255
+277
+288
+B4
+B4
+1
+12
+3
+1
+1
+NIL
+HORIZONTAL
+
+PLOT
+624
+527
+1010
+740
+# of "B" students in each activity
+time
+count
+0.0
+1450.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"read" 1.0 0 -16777216 true "" "plot count students with [class = \"B\" and state = \"read\" and partner = nobody]"
+"consult" 1.0 0 -8630108 true "" "plot count students with [class = \"B\" and state = \"consult\"]"
+"collab" 1.0 0 -817084 true "" "plot count students with [class = \"B\" and is-student? partner]"
+"rest" 1.0 0 -8732573 true "" "plot count students with [class = \"B\" and state = \"rest\"]"
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1204,6 +1335,349 @@ NetLogo 5.2.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="A6222 rep20 useNrg" repetitions="20" runMetricsEveryStep="false">
+    <setup>random-seed 1000 + behaviorspace-run-number
+setup</setup>
+    <go>go</go>
+    <final>export-plot "LearnChanceVsKnowledge" (word "A6222 rep20 useNRG plot" behaviorspace-run-number ".csv")</final>
+    <timeLimit steps="1441"/>
+    <metric>[knowledge] of students</metric>
+    <enumeratedValueSet variable="consumeEnergy">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ZPD">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numA">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A1">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A2">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A3">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A4">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numB">
+      <value value="0"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="A6141 rep20 useNrg" repetitions="20" runMetricsEveryStep="false">
+    <setup>random-seed 6141 + behaviorspace-run-number
+setup</setup>
+    <go>go</go>
+    <final>export-plot "LearnChanceVsKnowledge" (word behaviorspace-experiment-name "plot" behaviorspace-run-number ".csv")</final>
+    <timeLimit steps="1441"/>
+    <metric>mean [knowledge] of students</metric>
+    <metric>standard-deviation [knowledge] of students</metric>
+    <enumeratedValueSet variable="consumeEnergy">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ZPD">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numA">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A1">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A2">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A3">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A4">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numB">
+      <value value="0"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="A6114 rep20 useNrg" repetitions="20" runMetricsEveryStep="false">
+    <setup>random-seed 6114 + behaviorspace-run-number
+setup</setup>
+    <go>go</go>
+    <final>export-plot "LearnChanceVsKnowledge" (word behaviorspace-experiment-name "plot" behaviorspace-run-number ".csv")</final>
+    <timeLimit steps="1441"/>
+    <metric>mean [knowledge] of students</metric>
+    <metric>standard-deviation [knowledge] of students</metric>
+    <enumeratedValueSet variable="consumeEnergy">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ZPD">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numA">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A1">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A2">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A3">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A4">
+      <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numB">
+      <value value="0"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="A3333 rep20 useNrg" repetitions="20" runMetricsEveryStep="false">
+    <setup>random-seed 3333 + behaviorspace-run-number
+setup</setup>
+    <go>go</go>
+    <final>export-all-plots (word behaviorspace-experiment-name "plot" behaviorspace-run-number ".csv")</final>
+    <timeLimit steps="1441"/>
+    <metric>mean [knowledge] of students</metric>
+    <metric>standard-deviation [knowledge] of students</metric>
+    <enumeratedValueSet variable="consumeEnergy">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ZPD">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numA">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A1">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A2">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A3">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A4">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numB">
+      <value value="0"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="A3252 rep20 useNrg" repetitions="20" runMetricsEveryStep="false">
+    <setup>random-seed 3252 + behaviorspace-run-number
+setup</setup>
+    <go>go</go>
+    <final>export-all-plots (word behaviorspace-experiment-name "plot" behaviorspace-run-number ".csv")</final>
+    <timeLimit steps="1441"/>
+    <metric>mean [knowledge] of students</metric>
+    <metric>standard-deviation [knowledge] of students</metric>
+    <enumeratedValueSet variable="consumeEnergy">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ZPD">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numA">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A1">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A2">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A3">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A4">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numB">
+      <value value="0"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="A3225 rep20 useNrg" repetitions="20" runMetricsEveryStep="false">
+    <setup>random-seed 3225 + behaviorspace-run-number
+setup</setup>
+    <go>go</go>
+    <final>export-all-plots (word behaviorspace-experiment-name "plot" behaviorspace-run-number ".csv")</final>
+    <timeLimit steps="1441"/>
+    <metric>mean [knowledge] of students</metric>
+    <metric>standard-deviation [knowledge] of students</metric>
+    <enumeratedValueSet variable="consumeEnergy">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ZPD">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numA">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A1">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A2">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A3">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A4">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numB">
+      <value value="0"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="ratio A6222 B3333 rep10 useNrg" repetitions="10" runMetricsEveryStep="false">
+    <setup>random-seed 62223333 + behaviorspace-run-number
+setup</setup>
+    <go>go</go>
+    <timeLimit steps="1441"/>
+    <metric>mean [knowledge] of students</metric>
+    <metric>standard-deviation [knowledge] of students</metric>
+    <metric>mean [knowledge] of students with [class = "A"]</metric>
+    <metric>standard-deviation [knowledge] of students with [class = "A"]</metric>
+    <metric>mean [knowledge] of students with [class = "B"]</metric>
+    <metric>standard-deviation [knowledge] of students with [class = "B"]</metric>
+    <enumeratedValueSet variable="consumeEnergy">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ZPD">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="numA" first="2" step="2" last="18"/>
+    <enumeratedValueSet variable="numTotal">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A1">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A2">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A3">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A4">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="B1">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="B2">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="B3">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="B4">
+      <value value="3"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="chanceOfLearning 10A6222 10B3333 rep10 useNrg" repetitions="10" runMetricsEveryStep="false">
+    <setup>random-seed 62223333 + behaviorspace-run-number
+setup</setup>
+    <go>go</go>
+    <final>export-plot "LearnChanceVsKnowledge" (word behaviorspace-experiment-name "plot" behaviorspace-run-number ".csv")</final>
+    <timeLimit steps="1441"/>
+    <metric>mean [knowledge] of students</metric>
+    <metric>standard-deviation [knowledge] of students</metric>
+    <metric>mean [knowledge] of students with [class = "A"]</metric>
+    <metric>standard-deviation [knowledge] of students with [class = "A"]</metric>
+    <metric>mean [knowledge] of students with [class = "B"]</metric>
+    <metric>standard-deviation [knowledge] of students with [class = "B"]</metric>
+    <enumeratedValueSet variable="consumeEnergy">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ZPD">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numA">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numTotal">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A1">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A2">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A3">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A4">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="B1">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="B2">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="B3">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="B4">
+      <value value="3"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="chanceOfLearning 10A6222 10B3333 single" repetitions="1" runMetricsEveryStep="false">
+    <setup>random-seed 62223333 + behaviorspace-run-number
+setup</setup>
+    <go>go</go>
+    <final>export-plot "LearnChanceVsKnowledge" (word behaviorspace-experiment-name "plot" behaviorspace-run-number ".csv")</final>
+    <timeLimit steps="1441"/>
+    <metric>mean [knowledge] of students</metric>
+    <metric>standard-deviation [knowledge] of students</metric>
+    <metric>mean [knowledge] of students with [class = "A"]</metric>
+    <metric>standard-deviation [knowledge] of students with [class = "A"]</metric>
+    <metric>mean [knowledge] of students with [class = "B"]</metric>
+    <metric>standard-deviation [knowledge] of students with [class = "B"]</metric>
+    <enumeratedValueSet variable="consumeEnergy">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ZPD">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numA">
+      <value value="50"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="numTotal">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A1">
+      <value value="6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A2">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A3">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="A4">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="B1">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="B2">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="B3">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="B4">
+      <value value="3"/>
+    </enumeratedValueSet>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
